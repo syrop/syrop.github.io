@@ -104,7 +104,7 @@ You can use this technique if you do not really want to dispose the whole subscr
 {% highlight kotlin %}
 
 @MainThread
-inline fun <reified T>LifecycleOwner.inLifecycle(crossinline f: (T) -> Unit) =
+inline fun <reified T> LifecycleOwner.inLifecycle(crossinline f: (T) -> Unit) =
     MutableLiveData<T>().apply {
         observe(this@inLifecycle, Observer<T>  { f(it) })
     }
