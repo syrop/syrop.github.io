@@ -153,6 +153,8 @@ observable.subscribe { response ->
 
 {% endhighlight %}
 
+The method `inLifecycle` needs to be called **specifically outside of the** `subscribe` **block**, as it then starts observing the `LiveData`, and therefore may cancel the observation, **before the** `subscribe` **block is called**, so that any instances of `Activity` or other lifecycle-dependent classes will not be retained when they are no longer relevant.
+
 Depending on your situation you can use the `inLifecycle` method to create code that depends or does not depend on passed parameters.
 
 You state the parameter type in angle brackets, if you want to use one, or just write `<Unit>` if you do not need it.
