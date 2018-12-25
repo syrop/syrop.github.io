@@ -149,6 +149,7 @@ observable.subscribe { response ->
 		println("This executes independently of the lifecycle state")
 		onSuccess()  // won't perform any action if not in the correct state
 	}
+}
 
 {% endhighlight %}
 
