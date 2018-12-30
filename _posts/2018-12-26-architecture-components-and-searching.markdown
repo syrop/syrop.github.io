@@ -1,16 +1,16 @@
 ---
 layout: post
-title:  "Architecture Components and searching"
+title:  "Architecture components and searching"
 date:   2018-12-26 8:42:00 +0100
 categories: jekyll update
 ---
-In this article I will explain how to use [Architecture Components][architecture-components], specifically [Navigation][navigation] for creation of a [Fragment][fragment] using a searching UI.
+In this article I will explain how to use [Architecture components][architecture-components], specifically [Navigation][navigation] for creation of a [Fragment][fragment] using a searching UI.
 
 As an example I will use the project [Viktor-Events][events]. Please note that it is not production ready, so you will not find it on Google Play, but you can clone the repository, compile it and run it from Android Studio.
 
 ## Adding Navigation
 
-To use Navigation (Architecture Component), use the following dependencies:
+To use Navigation (Architecture component), use the following dependencies:
 
 {% highlight groovy %}
 
@@ -23,7 +23,7 @@ Unfortunately, the libraries are still in alpha, but I've been able to use it in
 
 The [navigation graph][navigation-graph], though too big to embed in this article, can be vieved in XML form directly on GitHub.
 
-The code that actually embeds the `Fragment`s, using Navigation Architecture Component, into their `Activity` is as follows.
+The code that actually embeds the `Fragment`s, using Navigation Architecture component, into their `Activity` is as follows.
 
 {% highlight xml %}
 <?xml version="1.0" encoding="utf-8"?>

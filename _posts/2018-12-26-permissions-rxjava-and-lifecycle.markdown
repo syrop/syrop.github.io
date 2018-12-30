@@ -27,7 +27,7 @@ class PermissionRequest(
 
 ## Requesting the permissions
 
-Permissions are requested by calling a global extention function called on the `Fragment`. Because I use [Navigation][navigation] Architecture Component almost all of GUI is implementet in `Fragment`s as opposed to `Activity`s, but one could write a similar extention function for `Activity` as well:
+Permissions are requested by calling a global extention function called on the `Fragment`. Because I use [Navigation][navigation] Architecture component almost all of GUI is implementet in `Fragment`s as opposed to `Activity`s, but one could write a similar extention function for `Activity` as well:
 
 {% highlight kotlin %}
 
