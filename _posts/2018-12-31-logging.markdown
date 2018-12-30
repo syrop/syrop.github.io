@@ -1,0 +1,91 @@
+---
+layout: post
+title:  "Logging"
+date:   2018-12-31 0:06:00 +0100
+categories: jekyll update
+---
+
+This article will explain a simple way in which you can obtain an instance of `java.util.logging.Logger` through dependency injection.
+
+For dependency injection I am going to use the library [Kodein][kodein-di]. If you need an introduction to Kodein, please see [this article][di-article] in this blog.
+
+The purpose of this article is to show you how to create a separate instance of `Logger` for every class, as well as how to automatically disable debug messages in production builds.
+
+## Configuring Kodein
+
+To create a binding for codein, please use the following code:
+
+{% highlight kotlin %}
+
+bind<Logger>() with multiton { tag: String ->
+    Logger.getLogger(tag)!!.apply {
+        if (!BuildConfig.DEBUG) {
+            setFilter { false }
+        }
+    }
+}
+
+{% endhighlight %}
+
+This creates a multiton. Accorting to [Kodein documentation][kodein-di]:
+
+> A multiton can be thought of a "singleton factory": it guarantees to always return the same object given the same argument. In other words, for a given argument, the first time a multiton is called with this argument, it will call the function to create an instance; and will always yield that same instance when called with the same argument.
+
+This line assures that a separate instance of `Logger` is created for every class, and that if it is not inside a debug build, it immediately calls the code `setFilter { false }` on it, which prevents any logging at all.
+
+Because it is a multiton, as opposed to a factory that creates a new instance each time an instance is needed, the code setting the filter is invoked only once per every class that uses logging.
+
+## Retrieval
+
+This is a generic function that retrieves multiton instnances using Kodein:
+
+{% highlight kotlin %}
+
+inline fun <reified A, reified T : Any> instance(arg: A): T {
+    val result by Kodein.global.instance<A, T>(arg = arg)
+    return result
+}
+
+{% endhighlight %}
+
+This is how this function is called to retrieve an instance of the Logger:
+
+{% highlight kotlin %}
+
+val Any.log get() = instance<String, Logger>(this::class.java.name)
+
+{% endhighlight %}
+
+Because it is an extension function that extends `Any`, it can be called from all Kotlin classes, and each time it will return exactly one instance per class it was called from.
+
+It is called like this:
+
+{% highlight kotlin %}
+
+class MainActivity: AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+
+        log.info("line 1")
+        log.info("line 2")
+        log.info("line 3")
+    }
+}
+
+{% endhighlight %}
+
+Because it is a multiton, only one instance of `Logger` is created in the above code. Furthermode, because of the way Kodein is configured, if this is called from a production build, no debug messages will be produced.
+
+You can see logging and dependency injection being used this way in my project [Victor-Events][events].
+
+
+## Donations
+
+If you've enjoyed this article, consider donating some bitcoin: bc1qncxh5xs6erq6w4qz3a7xl7f50agrgn3w58dsfp (you can also look at [donations page][donations]).
+
+[kodein-di]: https://kodein.org/di/
+[di-article]: https://syrop.github.io/jekyll/update/2018/12/25/testing-with-dependency-injection.html
+[kodein-multiton]: http://kodein.org/Kodein-DI/?6.0/core#_multiton_binding
+[events]: https://github.com/syrop/Victor-Events
+[donations]: https://syrop.github.io/donate/

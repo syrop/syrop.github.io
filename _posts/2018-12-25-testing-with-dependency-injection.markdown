@@ -8,7 +8,7 @@ In this article I will explain how to use dependency injection for testing.
 
 In the article I use code snippets from the project [GPS-Texter][texter]. This application sends a text message each time distance from home location changes by 2 kilometres. In the test run I will use a mock location hardcoded in a test class, and instead of really sending text messages I will just count how many times the application was trying to send them and compare this number with the expected value.
 
-For dependency injection I use [Kodein][kodein].
+For dependency injection I use [Kodein][kodein-di].
 
 To use Kodein in your project, add the relevant dependencies:
 
@@ -243,6 +243,6 @@ Because thus configured application uses the injected mock location simulator an
 Android Espresso is used herein only for waiting a specified amount of seconds. All other actions, like simulating location changes, and counting the sent messages, are performed by the injected objects inside of the tested application.
 
 [texter]: https://github.com/syrop/GPS-Texter
-[kodein]: https://kodein.org/
+[kodein-di]: https://kodein.org/di/
 [kodein-android]: http://kodein.org/Kodein-DI/?6.0/android
 
