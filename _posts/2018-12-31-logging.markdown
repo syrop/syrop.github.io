@@ -25,7 +25,7 @@ Because of the above global extension function, each time you use the expression
 
 The following sections will explain how to create a similar effect with dependency injection, so that a custom instance of `Logger` can be retrieved depending on the way you run your application.
 
-You can see [another article][testing-article] in this blog to find out how to configure Kodein specifically so that other kinds of instances are retrieved when the application is run with Android Espresso.
+You can see a [separate article][testing-article] in this blog to find out how to configure Kodein specifically so that other kinds of instances are retrieved when the application is run with Android Espresso.
 
 ## Configuring Kodein
 
