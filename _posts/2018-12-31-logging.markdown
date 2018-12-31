@@ -7,13 +7,29 @@ categories: jekyll update
 
 This article will explain a simple way in which you can obtain an instance of `java.util.logging.Logger` through dependency injection.
 
-For dependency injection I am going to use the library [Kodein][kodein-di]. If you need an introduction to Kodein, please see [this article][di-article] in this blog.
+For dependency injection I am going to use the library [Kodein][kodein-di]. If you need an introduction to Kodein, please see [this article][testing-article] in this blog.
 
 The purpose of this article is to show you how to create a separate instance of `Logger` for every class, as well as how to automatically disable debug messages in production builds.
 
+## Without Kodein
+
+To create a good enough effect without using Kodein, or dependency injection, just use the following line:
+
+{% highlight kotlin %}
+
+val Any.log get() = Logger.getLogger(this::class.java.name)!!
+
+{% endhighlight %}
+
+Because of the above global extension function, each time you use the expression `log` in your code, it will be interpreted as creation of an instance of `java.util.logging.Logger` with passing the name of the current class to its constructor.
+
+The following sections will explain how to create a similar effect with dependency injection, so that a custom instance of `Logger` can be retrieved depending on the way you run your application.
+
+You can see [another article][testing-article] in this blog to find out how to configure Kodein specifically so that other kinds of instances are retrieved when the application is run with Android Espresso.
+
 ## Configuring Kodein
 
-To create a binding for codein, please use the following code:
+To create a binding for Kodein, please use the following code:
 
 {% highlight kotlin %}
 
@@ -27,7 +43,7 @@ bind<Logger>() with multiton { tag: String ->
 
 {% endhighlight %}
 
-This creates a multiton. Accorting to [Kodein documentation][kodein-di]:
+This creates a multiton. According to [Kodein documentation][kodein-di]:
 
 > A multiton can be thought of a "singleton factory": it guarantees to always return the same object given the same argument. In other words, for a given argument, the first time a multiton is called with this argument, it will call the function to create an instance; and will always yield that same instance when called with the same argument.
 
@@ -85,7 +101,7 @@ You can see logging and dependency injection being used this way in my project [
 If you've enjoyed this article, consider donating some bitcoin: bc1qncxh5xs6erq6w4qz3a7xl7f50agrgn3w58dsfp (you can also look at [donations page][donations]).
 
 [kodein-di]: https://kodein.org/di/
-[di-article]: https://syrop.github.io/jekyll/update/2018/12/25/testing-with-dependency-injection.html
+[testing-article]: https://syrop.github.io/jekyll/update/2018/12/25/testing-with-dependency-injection.html
 [kodein-multiton]: http://kodein.org/Kodein-DI/?6.0/core#_multiton_binding
 [events]: https://github.com/syrop/Victor-Events
 [donations]: https://syrop.github.io/donate/
