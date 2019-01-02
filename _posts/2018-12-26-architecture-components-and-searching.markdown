@@ -73,8 +73,12 @@ The `Activity` and `Fragment` share one instance of `ViewModel`:
 {% highlight kotlin %}
 
 class EventsViewModel : ViewModel() {
-    val query: MutableLiveData<String> = MutableLiveData()
-    val commToCreate: MutableLiveData<String?> = MutableLiveData()
+    val query by lazy {
+        MutableLiveData<String>()
+    }
+    val commToCreate by lazy {
+        MutableLiveData<String?>()
+    }
 }
 
 {% endhighlight %}
