@@ -34,10 +34,10 @@ Permissions are requested by calling a global extention function called on the `
 fun Fragment.requestPermissions(
         requestCode: Int,
         permissions: Array<Permissions.PermissionRequest>) =
-    permissions().request(
+    permissions.request(
             this,
             requestCode,
-            permissions)
+            requests)
 
 {% endhighlight %}
 
@@ -53,7 +53,7 @@ It is then retrieved by this global function:
 
 {% highlight kotlin %}
 
-fun permissions = instance<Permissions>()
+val permissions get() = instance<Permissions>()
 
 {% endhighlight %}
 
