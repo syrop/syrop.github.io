@@ -33,7 +33,7 @@ Permissions are requested by calling a global extention function called on the `
 
 fun Fragment.requestPermissions(
         requestCode: Int,
-        permissions: Array<Permissions.PermissionRequest>) =
+        requests: Array<Permissions.PermissionRequest>) =
     permissions.request(
             this,
             requestCode,
