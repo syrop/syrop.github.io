@@ -20,17 +20,12 @@ fun <T> Observable<T>.subscribe(lifecycle: Lifecycle, onNext: (T) -> Unit) =
 private fun Disposable.observeLifecycle(lifecycle: Lifecycle) =
         lifecycle.addObserver(RxLifecycleObserver(lifecycle, this))
 
-private class RxLifecycleObserver(
-        private val lifecycle: Lifecycle,
-        private val subscription: Disposable) : LifecycleObserver {
-    private val initialState = lifecycle.currentState
+private class RxLifecycleObserver(private val subscription: Disposable) : LifecycleObserver {
 
     @Suppress("unused")
-    @OnLifecycleEvent(Lifecycle.Event.ON_ANY)
+    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
     private fun onEvent() {
-        if (!lifecycle.currentState.isAtLeast(initialState)) {
-            subscription.dispose()
-        }
+        subscription.dispose()
     }
 }
 
@@ -38,13 +33,27 @@ private class RxLifecycleObserver(
 
 In the above code there is one global `subscribe` function that takes in a `lifecycle` instance and a lambda expression as parameters.
 
-It then creates the subscription by calling the original `subscribe` fuctnion form RxJava, and calls a private extenstion method `observeLifecycle` on it to react to lifecycle events.
+It then creates the subscription by calling the original `subscribe` function form RxJava, and calls a private extenstion method `observeLifecycle` on it to react to lifecycle events.
 
-The method `observeLifecycle`, in turn, creates an instance of a class extending `LifecycleObserver`, which is here called `RxLifecycleObserver`, and passes `lifecycle` itself to it, as well as the `subscription` created in the previous step.
+The method `observeLifecycle`, in turn, creates an instance of a class extending `LifecycleObserver`, which is here called `RxLifecycleObserver`, and passes to it the `subscription` created in the previous step.
 
-Then, the `RxLifecycleObserver` in its own constructon remembers the initial state the lifecycle is in to compare it with subsequent states.
+When the state becomes `DESTROYED`, the subscription is automatically disposed.
 
-When the state becomes **less than** the initial state, (for example when `Activity#onStop() onStop` was called if the initial state was `CREATED`, or when `Activity#onPause() onPause` was called if the initial state was `STARTED`), the subscription is automatically disposed.
+CAUTION: Do not dispose subscription when your activity or fragment is paused (as opposed to destroyed). Fragments become paused when you show permission-request dialog. (Example: when you request location permission afted displaying a map). You probably do not want to prematurely dispose your subscriptions.
+
+If you are sure your subscription must be disposed when the lifecycle enters a state that is even one grade lower than when the subscription was created, you can use the following code:
+
+{% highlight kotlin %}
+
+@Suppress("unused")
+@OnLifecycleEvent(Lifecycle.Event.ON_ANY)
+private fun onEvent() {
+    if (!lifecycle.currentState.isAtLeast(initialState)) {
+        subscription.dispose()
+    }
+}
+
+{% endhighlight %}
 
 ## Calling
 

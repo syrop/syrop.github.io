@@ -35,7 +35,7 @@ fun Fragment.requestPermissions(
         requestCode: Int,
         permissions: Array<Permissions.PermissionRequest>) =
     permissions().request(
-            activity!! as AppCompatActivity,
+            this,
             requestCode,
             permissions)
 
@@ -53,7 +53,7 @@ It is then retrieved by this global function:
 
 {% highlight kotlin %}
 
-fun permissions() = instance<Permissions>()
+fun permissions = instance<Permissions>()
 
 {% endhighlight %}
 
@@ -67,10 +67,10 @@ class Permissions {
     private val deniedSubject = PublishSubject.create<PermissionResult>()
 
     fun request(
-            activity: AppCompatActivity,
+            fragment: Fragment,
             requestCode: Int,
-            permissions: Array<PermissionRequest>) {
-        val lifecycle = activity.lifecycle
+            requests: Array<PermissionRequest>) {
+        val lifecycle = fragment.lifecycle
         val permissionsToRequest = ArrayList<String>()
         permissions.forEach { permission ->
             permissionsToRequest.add(permission.permission)
@@ -81,7 +81,7 @@ class Permissions {
                         .filter { it.requestCode == requestCode && it.permission == permission.permission }
                         .subscribe(lifecycle) { permission.onDenied() }
         }
-        ActivityCompat.requestPermissions(activity, permissionsToRequest.toTypedArray(), requestCode)
+        fragment.requestPermissions(permissionsToRequest.toTypedArray(), requestCode)
     }
     ...
 }
@@ -89,6 +89,8 @@ class Permissions {
 {% endhighlight %}
 
 It uses `lifecycle` to automatically dispose the subscriptions when activity ends. Making lifecycle-aware subscribtions has been described in this blog in the article called '[Lifecycle-aware Rx subscriptions][lifecycle]'.
+
+CAUTION: Do not use the method `ActivityCompat.requestPermissions()`. Although you can adapt the above code to successfully use this method to request permissions, if you do this instead of calling the method `requestPermissions` directly on `Fragment`, only the callback `onRequestPermissionsResult()` inside the `Activity` (not `Fragment`) will be called.
 
 ## In the Fragment
 
