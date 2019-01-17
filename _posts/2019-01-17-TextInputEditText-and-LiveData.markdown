@@ -195,20 +195,7 @@ class CreateEventViewModel : ViewModel() {
 
 Because `description` is of type `MutableLiveData<String?>`, instead of clearing its value by setting it to an empty string, you may just as well set it to `null`, depending on the effect you want to achieve.
 
-
 [victor-events]: https://github.com/syrop/Victor-Events
 [selecting-location]: https://syrop.github.io/jekyll/update/2019/01/09/selecting-location-advanced-topic.html
 [textwatcher]: https://developer.android.com/reference/android/text/TextWatcher
-
-[displaying-google-maps]: https://syrop.github.io/jekyll/update/2018/12/28/displaying-google-maps.html
-[jetpack]: https://developer.android.com/jetpack/
-[navigation-article]: https://syrop.github.io/jekyll/update/2018/12/26/architecture-components-and-searching.html
-[kodein]: http://kodein.org/Kodein-DI/
-[testing]: https://syrop.github.io/jekyll/update/2018/12/25/testing-with-dependency-injection.html
-[logging]: https://syrop.github.io/jekyll/update/2018/12/30/logging.html
-[geocoder-google]: https://developer.android.com/training/location/display-address
-[kodeinmodulebuilder]: https://github.com/syrop/Victor-Events/blob/master/events/src/main/kotlin/pl/org/seva/events/main/KodeinModuleBuilder.kt
-[location-picker]: https://github.com/syrop/Victor-Events/blob/master/events/src/main/kotlin/pl/org/seva/events/event/LocationPickerFragment.kt
-[pickers]: https://developer.android.com/guide/topics/ui/controls/pickers
-[create-event-fragment]: https://github.com/syrop/Victor-Events/blob/master/events/src/main/kotlin/pl/org/seva/events/event/CreateEventFragment.kt
 
