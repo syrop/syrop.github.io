@@ -72,9 +72,9 @@ inline fun <reified R : ViewModel> FragmentActivity.viewModel() =
 
 {% endhighlight %}
 
-## XML file containing the TextInputLayout
+## XML file containing the TextInputEditText
 
-This is the XML code defining the `TextInputLayout` that will be programmatically attached to an instance of `LiveData`:
+This is the XML code defining the `TextInputEditText` that will be programmatically attached to an instance of `LiveData`:
 
 {% highlight xml %}
 
