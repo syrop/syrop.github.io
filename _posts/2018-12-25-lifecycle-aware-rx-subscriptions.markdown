@@ -23,7 +23,7 @@ private fun Disposable.observeLifecycle(lifecycle: Lifecycle) =
 private class RxLifecycleObserver(private val subscription: Disposable) : LifecycleObserver {
 
     @Suppress("unused")
-    @OnLifecycleEvent(Lifecycle.Event.ON_DESTROY)
+    @OnLifecycleEvent(Lifecycle.Event.ON_STOP)
     private fun onEvent() {
         subscription.dispose()
     }
@@ -31,13 +31,13 @@ private class RxLifecycleObserver(private val subscription: Disposable) : Lifecy
 
 {% endhighlight %}
 
-In the above code there is one global `subscribe` function that takes in a `lifecycle` instance and a lambda expression as parameters.
+In the above code there is one global `subscribe()` function that takes in a `lifecycle` instance and a lambda expression as parameters.
 
-It then creates the subscription by calling the original `subscribe` function form RxJava, and calls a private extenstion method `observeLifecycle` on it to react to lifecycle events.
+It then creates the subscription by calling the original `subscribe` function form RxJava, and calls a private extenstion function `observeLifecycle()` on it to react to lifecycle events.
 
-The method `observeLifecycle`, in turn, creates an instance of a class extending `LifecycleObserver`, which is here called `RxLifecycleObserver`, and passes to it the `subscription` created in the previous step.
+The function `observeLifecycle()`, in turn, creates an instance of a class extending `LifecycleObserver`, which is here called `RxLifecycleObserver`, and passes to it the `disposable` created in the previous step.
 
-When the state becomes `DESTROYED`, the subscription is automatically disposed.
+When the state changes from `STARTED` to `CREATED`, the subscription is automatically disposed. (According to [Lifecycle documentation][lifecycle] this happens right before `onStop()` is called).
 
 CAUTION: Do not dispose subscription when your activity or fragment is paused (as opposed to destroyed). Fragments become paused when you show permission-request dialog. (Example: when you request location permission afted displaying a map). You probably do not want to prematurely dispose your subscriptions.
 
@@ -172,4 +172,5 @@ To call the code you use the parameterless `()` operator, defined in the code as
 
 
 [navigator]: https://github.com/syrop/Wiktor-Navigator
+[lifecycle]: https://developer.android.com/reference/android/arch/lifecycle/Lifecycle
 
