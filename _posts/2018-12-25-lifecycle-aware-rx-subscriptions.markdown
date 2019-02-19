@@ -41,7 +41,7 @@ When the state becomes `DESTROYED`, the subscription is automatically disposed.
 
 CAUTION: Do not dispose subscription when your activity or fragment is paused (as opposed to destroyed). Fragments become paused when you show permission-request dialog. (Example: when you request location permission afted displaying a map). You probably do not want to prematurely dispose your subscriptions.
 
-If you are sure your subscription must be disposed when the lifecycle enters a state that is even one grade lower than when the subscription was created, you can use the following code:
+If you are sure your subscription must be disposed as soon as the lifecycle enters a state that is even one grade lower than when the subscription was created, you can use the following code:
 
 {% highlight kotlin %}
 
