@@ -47,8 +47,6 @@ Even though both extensions functions look similar, one function cannot call the
 
 This time the `viewModel` function is called on `Fragment` immediately and returns a lazy delegate that only later is used to create an instance of `ViewModel`. `activity` is `null` at that stage, so you cannot just call `activity!!.viewModel`, or it would throw a `KotlinNullPointerException'.
 
-Please note that you cannot refer to thus created instance of `ViewModel` in your `onCreateView()` function, because `activity` still equals `null` at this stage of the `Fragment`s lifecycle, but you can comfortably refer to it in `onViewCreated()`. 
-
 ## In classes other than Activity and Fragment
 
 When you want to gain control over the moment when your `ViewModel` is created, you can use the form I used in my class `InteractiveMapHolder`.
