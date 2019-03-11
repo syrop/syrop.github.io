@@ -41,7 +41,7 @@ fun Fragment.requestPermissions(
 
 {% endhighlight %}
 
-The call `permissions()` automatically retrieves an instance of the permission-handling class, whose Kodein binding has been created in the module by this line:
+The call `permissions` automatically retrieves an instance of the permission-handling class, whose Kodein binding is created in the module in this line:
 
 {% highlight kotlin %}
 
@@ -49,7 +49,7 @@ bind<Permissions>() with singleton { Permissions() }
 
 {% endhighlight %}
 
-It is then retrieved by this global function:
+It is then retrieved by this global property:
 
 {% highlight kotlin %}
 
