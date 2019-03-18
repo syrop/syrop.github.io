@@ -5,7 +5,7 @@ date:   2019-03-18 9:29:00 +0100
 categories: jekyll update
 ---
 
-This article explains how to combine RxJava's `Observable` and Android Jetpacks's `LiveData`.
+This article explains how to combine RxJava's `Observable` and Android Jetpack's `LiveData`.
 
 ## In the previous episode
 
