@@ -22,7 +22,7 @@ deniedSubject
 
 The disadvantage of such solution was that `toLiveData()` created a `Disposable` that was never disposed. It didn't leak the entire `Activity` or `Fragment`, but it did leave something begind, namely the RxJava's `Disposable` and the `LiveData` itself.
 
-While I was writing the previous article I considered it a good trade off, as you were gaining a convenient way combine `LiveData` with `Observable` while at the same time avoiding `Activity` leak.
+While I was writing the previous article I considered it a good trade-off, as you were gaining a convenient way combine `LiveData` with `Observable` while at the same time avoiding `Activity` leak.
 
 ## Improved solution
 
