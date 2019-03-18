@@ -28,7 +28,7 @@ While I was writing the previous article I considered it a good trade-off, as yo
 
 In the present article I will explain how to use `LiveData` in a way similar to the one described previously, but this time avoiding any leaks at all, and disposing the `Disposable` as soon as `Activity` or `Fragment` is destroyed.
 
-The solution is present project [Victor Events][victor-events] in its most up-to-date state on GitHub.
+The solution is present in project [Victor Events][victor-events] in its most up-to-date state on GitHub.
 
 This time you skip the `toLiveData()` function, invoked in the above code snippet, and invoke `observe()` directly:
 
