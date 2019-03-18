@@ -9,7 +9,7 @@ This article explains how to combine RxJava's `Observable`s and `LiveData`.
 
 ## In the previous episode
 
-In the [previous article][previous-article] I explained how to **convert** the `Observable` into an instance of `LiveData`. The conversion was executed this way:
+In the [previous article][previous-article] I explained how to *convert* the `Observable` into an instance of `LiveData`. The conversion was executed this way:
 
 {% highlight kotlin %}
 
