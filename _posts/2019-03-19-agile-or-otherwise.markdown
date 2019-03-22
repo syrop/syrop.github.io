@@ -62,7 +62,7 @@ The techniques I mostly promote in this blog are MVP model, where the presenter 
 [victor-events]: https://github.com/syrop/Victor-Events
 [tickets]: https://github.com/syrop/Victor-Events/issues
 [observable-to-livedata]: https://syrop.github.io/jekyll/update/2019/03/07/rx-observable-to-livedata.html
-[rxjava-and-livedata]: https://syrop.github.io/jekyll/update/2019/03/18/combining-rkvava-and-livedata.html
+[rxjava-and-livedata]: https://syrop.github.io/jekyll/update/2019/03/18/combining-rxjava-and-livedata.html
 [jetpack]: https://developer.android.com/jetpack/
 [kodein]: https://kodein.org/Kodein-DI/
 [technical-debt]: https://en.wikipedia.org/wiki/Technical_debt
