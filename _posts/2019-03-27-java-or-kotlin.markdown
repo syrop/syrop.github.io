@@ -39,7 +39,7 @@ I use Kotlin-specific [Kodein][kodein], which is also a dependency injection lib
 
 ## Coroutines and channels
 
-Coroutines went stable in Kotlin 1.3, and I do use them in the project [Viktor Events][events] when I access a Room database. Coroutines in their present form are good for running an action that is meant to run once, complete and maybe result in updating the UI.
+Coroutines went stable in Kotlin 1.3, and I do use them in the project [Victor Events][events] when I access a Room database. Coroutines in their present form are good for running an action that is meant to run once, complete and maybe result in updating the UI.
 
 Coroutines are not so good, though, at least not in Kotlin 1.3, to respond to events contituously, like to changing states of your phone (whether the phone is stationary or moving).
 
