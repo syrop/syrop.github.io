@@ -151,7 +151,7 @@ override fun onActivityCreated(savedInstanceState: Bundle?) {
 
     vm.progress.observe(this) {
         progress.text = getString(R.string.counter_fragment_progress)
-                .bold(PROGRESS, it.toString() )
+                .bold(PROGRESS, it.toString())
     }
     vm.result.observe(this) {
         result.text = getString(R.string.counter_fragment_result)
