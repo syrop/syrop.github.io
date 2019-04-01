@@ -11,7 +11,7 @@ I am not very excited about it, as I know techniques that I think are more suita
 
 ## The project
 
-The project I use in this example is called - appropriately - [AsyncTask][asynctaksk]. It is a copy of my project [MyApplication][myapplication], with all its history wiped, and with some extension functions copied from [Victor-Events][events].
+The project I use in this example is called - appropriately - [AsyncTask][asynctask]. It is a copy of my project [MyApplication][myapplication], with all its history wiped, and with some extension functions copied from [Victor-Events][events].
 
 ## The ViewModel
 
