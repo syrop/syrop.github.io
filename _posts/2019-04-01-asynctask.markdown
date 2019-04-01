@@ -113,7 +113,7 @@ override fun doInBackground(vararg params: Int?): Int {
 
 {% endhighlight %}
 
-The disadvantage of this approach is that I do not have a control on where the `Thread.sleep()` is executed. If I was using RxJava, I would use `Schedulers.io()`, and if I was usirg coroutines, I would use `Dispatchers.IO`, as I showed previously.
+The disadvantage of this approach is that I do not have control on where the `Thread.sleep()` is executed. If I was using RxJava, I would use `Schedulers.io()`, and if I was usirg coroutines, I would use `Dispatchers.IO`, as I showed previously.
 
 Still, the question was about using `AsyncTask`, and this is the simplest solutions I could come up with.
 
