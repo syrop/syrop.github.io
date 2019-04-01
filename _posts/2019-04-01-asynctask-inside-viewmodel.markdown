@@ -13,7 +13,7 @@ This may remind you of the refactoring I did in the article '[ViewModel and Comp
 
 ## The disadvantage
 
-All `AsyncTasks` in Android are run within a single thread, so - because in this particular `AsyncTask` I use a call to `Thread.sleep()` - it will block all other `AsyncTask`s if you try to run them simultaneously.
+All `AsyncTask`s in Android are run within a single thread, so - because in this particular `AsyncTask` I use a call to `Thread.sleep()` - it will block all other `AsyncTask`s if you try to run them simultaneously.
 
 ## The previous article
 
