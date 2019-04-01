@@ -96,7 +96,7 @@ I was briefly considering returning `Unit` in the above example and just interac
 
 The job interview question is specifically about `AsyncTask`, though, and I really wanted to prepare an answer for it that would take advantage of the `onPostExecute()` function, so I decided to simplify the above code and use threads instead of coroutines.
 
-## Second approach: threads
+## Second attempt: threads
 
 This is the implementation of the function `doInBackground()` that is really present in my [repository][asynctask] at the time of writing:
 
