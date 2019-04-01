@@ -194,7 +194,7 @@ I frankly admire the interviewers for still asking the candidates about the `Asy
 
 I remember reading in an article somewhere that `AsyncTask`s were prone to activity leaks or something, but as I've hopefully demonstraded with the above example, Android Jetpack helps to mitigate such dangers, even in APIs as ancient as `AsyncTask`.
 
-I think that the purpose of asking this question during an interview is verification whether the candidate is aware of traditional Android APIs (AsyncTask has been present in Android since API 3, HoneyComb), and whether they can use more modern solutions to mitigate the risks they involve.
+I think that the purpose of asking this question during an interview is verifying whether the candidate is aware of traditional Android APIs (AsyncTask has been present in Android since API 3, HoneyComb), and whether they can use more modern solutions to mitigate the risks they involve.
 
 I wouldn't be using the above code in production, though. I've used above the `Thread.sleep()` construction, which I would much rather replace with something from coroutines or RxJava. I've tested my solutions by rotating or turning off the screen while the `AsyncTask` was running, and I noticed that the screen was updating correctly, with no crashes. I haven't properly run memory profiling, though, and I didn't implement canceling the operation.
 
