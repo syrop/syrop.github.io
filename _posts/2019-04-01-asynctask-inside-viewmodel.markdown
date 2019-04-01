@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "AsyncTask inside ViewModel (advanced answer)"
+title:  "AsyncTask inside a ViewModel (advanced answer)"
 date:   2019-04-01 23:22:00 +0200
 categories: jekyll update
 ---
