@@ -136,6 +136,10 @@ override fun onPostExecute(result: Int?) {
 
 {% endhighlight %}
 
+Because `AsyncTask` guarantees that these two functions always run on the UI thread, I can use `this.result?.value = result`.
+
+If I wasn't sure that this line was going to be called from the UI thread, I would instead have to write: `this.result?.postValue(result)`, as only then would I be assured that the `Observer` is called on the correct thread (the UI thread).
+
 ## Launching the AsyncTask
 
 This is the code inside the `Fragment`'s function `onActivityCreated()`:
