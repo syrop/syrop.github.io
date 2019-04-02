@@ -99,7 +99,7 @@ override fun doInBackground(vararg params: Int?): Int {
 
 {% endhighlight %}
 
-Because I use a `repeat()` function that takes a lambda as a parameter, I have to use the expression `return@repeat` to break it. If I was using a `for` loop, I would write `break` instead.
+Because I use a `repeat()` function that takes a lambda, I have to use the expression `return@repeat` to break it. If I was using a `for` loop, I would write `break` instead.
 
 ## Conclusion
 
