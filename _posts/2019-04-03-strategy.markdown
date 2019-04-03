@@ -1,0 +1,196 @@
+---
+layout: post
+title:  "Strategy (design pattern)"
+date:   2019-04-03 21:19:00 +0200
+categories: jekyll update
+---
+
+This article demonstrates how to use the [strategy pattern][strategy].
+
+## The problem
+
+How to use a global extension function that uses a strategy retrieved using inversion of control.
+
+## Inversion of control
+
+For inversion of control I use [Kodein][kodein]. I demonstrate in this article how to configure Kodein on the fly, that is, that it can be configured and reconfigured as you change `Fragment`s displayed on the screen.
+
+Please note that reconfiguring Kodein on the fly is not a recommended solution. The [documentation][kodein-documentation] warns:
+
+> Using a mutable `ConfigurableKodein` can lead to **very bad code practice** and **very difficult bugs**.
+Therefore, using a mutable `ConfigurableKodein` **IS discouraged**.
+Note that every time a `ConfigurableKodein` is mutated, its cache is entirely flushed, meaning that it has a real impact on optimization!
+Please use the mutating feature only if you truly need it, know what you’re doing, and see no other way.
+
+In production you will probably want to change Kodein configuration on deployment, or create a separate Kodein module dedicated to Espresso tests. If you want to know how to create a separate Kodein module for tests, you can find information in a [separate article][testing] in this blog.
+
+Below in the present article I will show a few tricks you can use if you still want to change the configuration of Kodein as the application is running.
+
+## The project
+
+The example project used in the present article is [Strategy][strategy], created for the purpose.
+
+## The mutable Kodein
+
+This is the `interface` that gets the mutable Kodein. All classes implementing it will get access to the same mutable Kodein:
+
+{% highlight kotlin %}
+
+private val mutableKodein = ConfigurableKodein(true)
+
+interface MutableKodeinAware : KodeinAware {
+
+    override val kodein get() = mutableKodein
+}
+
+
+{% endhighlight %}
+
+
+## The strategy interface
+
+This is the strategy interface used in the project. It contains one function that emphasizes a fragment of text that matches a given placeholder. Depending on implementation, it either **emboldens** or *italicizes* it.
+
+{% highlight kotlin %}
+
+interface Emphasis {
+    fun emphasis(str: String, placeholder: String, replacement: String): CharSequence
+
+    companion object : MutableKodeinAware {
+        val instance get() = kodein.instance<Emphasis>()
+    }
+}
+
+{% endhighlight %}
+
+The `companiot object` of the above `interface` gets an instance of the mutable Kodein discussed in the previous section.
+
+## The strategy implementation
+
+This is the code of the two classes that implement the above `interface`, each `class` containing an implementation of its corresponding Kodein module:
+
+{% highlight kotlin %}
+
+class Bold : Emphasis {
+    override fun emphasis(str: String, placeholder: String, replacement: String): CharSequence {
+        val idName = str.indexOf(placeholder)
+        val idEndName = idName + replacement.length
+        val boldSpan = StyleSpan(Typeface.BOLD)
+        return SpannableStringBuilder(str.replace(placeholder, replacement)).apply {
+            setSpan(boldSpan, idName, idEndName, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+        }
+    }
+
+    companion object {
+        private const val MODULE_LABEL = "bold"
+        val MODULE = Kodein.Module(MODULE_LABEL) {
+            try {
+                bind<Emphasis>() with singleton { Bold() }
+            }
+            catch (ex: Kodein.OverridingException) {
+                bind<Emphasis>(overrides = true) with singleton { Bold() }
+            }
+        }
+    }
+}
+
+class Italic : Emphasis {
+    override fun emphasis(str: String, placeholder: String, replacement: String): CharSequence {
+        val idName = str.indexOf(placeholder)
+        val idEndName = idName + replacement.length
+        val boldSpan = StyleSpan(Typeface.ITALIC)
+        return SpannableStringBuilder(str.replace(placeholder, replacement)).apply {
+            setSpan(boldSpan, idName, idEndName, Spanned.SPAN_INCLUSIVE_EXCLUSIVE)
+        }
+    }
+
+    companion object {
+        private const val MODULE_LABEL = "italic"
+        val MODULE = Kodein.Module(MODULE_LABEL) {
+            try {
+                bind<Emphasis>() with singleton { Italic() }
+            }
+            catch (ex: Kodein.OverridingException) {
+                bind<Emphasis>(overrides = true) with singleton { Italic() }
+            }
+        }
+    }
+}
+
+{% endhighlight %}
+
+In the snippets provided I skip the [do not repeat yourself][dry] principle for increased readability of the code. If the code was meant to go to production, I would probably have to further work on its optimization.
+
+When defining the Kodein modules in the above code, each time I have to catch a `Kodein.OverridingException`, because I do not know in which order the bindings are going to be created. If you know more about the way Kodein is going to be configured in your particular project, you will probably write a simpler code of your module. For an example of code I used in production, where only one Kodein module (the test module) was overriding another, please see [this article][testing].
+
+## Configuring Kodein on the fly
+
+Having both modules created and ready for use, I decided to have them imported inside each `Fragment` code:
+
+{% highlight kotlin %}
+
+class BoldFragment : Fragment(), MutableKodeinAware {
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
+            inflate(R.layout.fr_bold, container)
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        kodein.addImport(Bold.MODULE, true)
+        text.text = getString(R.string.bold_fragment_prompt)
+                .emphasis(PLACEHOLDER, getString(R.string.bold_fragment_replacement))
+        next_fab.setOnClickListener { nav(R.id.action_firstFragment_to_italicFragment) }
+    }
+
+    companion object {
+        const val PLACEHOLDER = "[emphasis]"
+    }
+}
+
+class ItalicFragment : Fragment(), MutableKodeinAware {
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
+            inflate(R.layout.fr_italic, container)
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        kodein.addImport(Italic.MODULE, true)
+        text.text = getString(R.string.italic_fragment_prompt)
+                .emphasis(PLACEHOLDER, getString(R.string.italic_fragment_replacement))
+    }
+
+    companion object {
+        const val PLACEHOLDER = "[emphasis]"
+    }
+}
+
+{% endhighlight %}
+
+## The global extension function
+
+The two `Fragment`s select the Kodein module each of them is going to use. (Alternatively, in your code you can select a Kodein module per your flavour or running environment).
+
+Then they use the global `emphasis()` function that takes the placeholder and the replacement and returns a `CharSequence` with an appropriate emphasis:
+
+{% highlight kotlin %}
+
+fun String.emphasis(placeholder: String, replacement: String): CharSequence {
+    val emphasis by Emphasis.instance
+    return emphasis.emphasis(this, placeholder, replacement)
+}
+
+{% endhighlight %}
+
+## Conclusion
+
+In this article you have had a chance to learn how to implement the [strategy pattern][strategy] in Kotlin using inversion of control.
+
+I wrote it to answer a curious question whether it was possible in Kotlin to write a global function whose execution depends on an arbitrary binding made somewhere else in the code.
+
+[strategy]: https://en.wikipedia.org/wiki/Strategy_pattern
+[kodein]: http://kodein.org/Kodein-DI/
+[kodein-documentation]: https://github.com/EasyKotlin/Kodein/blob/master/DOCUMENTATION_V3.adoc#mutating
+[testing]: https://syrop.github.io/jekyll/update/2018/12/25/testing-with-dependency-injection.html
+[strategy]: https://github.com/syrop/Strategy
+[dry]: https://en.wikipedia.org/wiki/Do_not_repeat_yourself
+
