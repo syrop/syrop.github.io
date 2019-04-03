@@ -5,7 +5,7 @@ date:   2019-04-03 21:19:00 +0200
 categories: jekyll update
 ---
 
-This article demonstrates how to use the [strategy pattern][strategy].
+This article demonstrates how to use the [strategy pattern][strategy-pattern].
 
 ## The problem
 
@@ -183,11 +183,11 @@ fun String.emphasis(placeholder: String, replacement: String): CharSequence {
 
 ## Conclusion
 
-In this article you have had a chance to learn how to implement the [strategy pattern][strategy] in Kotlin using inversion of control.
+In this article you have had a chance to learn how to implement the [strategy pattern][strategy-pattern] in Kotlin using inversion of control.
 
 I wrote it to answer a curious question whether it was possible in Kotlin to write a global function whose execution depends on an arbitrary binding made somewhere else in the code.
 
-[strategy]: https://en.wikipedia.org/wiki/Strategy_pattern
+[strategy-pattern]: https://en.wikipedia.org/wiki/Strategy_pattern
 [kodein]: http://kodein.org/Kodein-DI/
 [kodein-documentation]: https://github.com/EasyKotlin/Kodein/blob/master/DOCUMENTATION_V3.adoc#mutating
 [testing]: https://syrop.github.io/jekyll/update/2018/12/25/testing-with-dependency-injection.html
