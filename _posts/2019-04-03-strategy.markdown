@@ -47,7 +47,7 @@ interface MutableKodeinAware : KodeinAware {
 {% endhighlight %}
 
 
-## The strategy interface
+## The interface
 
 This is the strategy interface used in the project. It contains one function that emphasizes a fragment of text that matches a given placeholder. Depending on implementation, it either **emboldens** or *italicizes* it.
 
