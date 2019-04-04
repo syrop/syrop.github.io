@@ -11,10 +11,6 @@ This time the instance of the AsyncTask is created inside a `ViewModel` and prop
 
 This may remind you of the refactoring I did in the article '[ViewModel and CompositeDisposable][viewmodel-and-disposable]', in which I created an RxJava `Disposable` - and properly disposed it - inside a `ViewModel`, so that the `Disposable` didn't have to be handled inside an `Activity` or a `Fragment`.
 
-## The disadvantage
-
-All `AsyncTask`s in Android are run within a single thread, so - because in this particular `AsyncTask` I use a call to `Thread.sleep()` - it will block all other `AsyncTask`s if you try to run them simultaneously.
-
 ## The previous article
 
 You may not understand the present article unless you have read the [previous one][previous] in which I discuss why I decided to discuss `AsyncTask` in the first place.
@@ -87,12 +83,14 @@ This is the code running in the `AsyncTask`, away from the UI thread:
 
 override fun doInBackground(vararg params: Int?): Int {
     val repetitions = params[0]!!
-    repeat(repetitions) {
-        if (isCancelled) {
-            return@repeat
+    runBlocking {
+        repeat(repetitions) {
+            if (isCancelled) {
+                return@repeat
+            }
+            publishProgress(it)
+            delay(1000L)
         }
-        publishProgress(it)
-        Thread.sleep(1000L)
     }
     return repetitions
 }
@@ -100,6 +98,8 @@ override fun doInBackground(vararg params: Int?): Int {
 {% endhighlight %}
 
 Because I use a `repeat()` function that takes a lambda, I have to use the expression `return@repeat` to break it. If I was using a `for` loop, I would write `break` instead.
+
+In the above code I had to use the function `runBlocking()` to obtain a scope in which I could run the `suspend` function `delay()`. In the [previous article] I demonstrated a failed attempt to do the same with with `launch()`. It didn't work, because `launch()` returns immediately, therefore `onPostExecute()` would be run before the counting even ends. Here I use `runBlocking()` which blocks the current thread until the block it contains is completed. The disadvantage of `runBlocking()` and `AsyncTask` in general is such that on Android all `AsyncTaksk` are executed in one thread, and because this particular `AsyncTask` takes about 10 seconds to run, no other `AsyncTask` should be executed simultaneously on the device. In the real case, if this code was meant to go to production, I would probably use some other coroutine scope or RxJava.
 
 ## Conclusion
 
