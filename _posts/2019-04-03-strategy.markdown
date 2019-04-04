@@ -54,7 +54,7 @@ This is the strategy interface used in the project. It contains one function tha
 {% highlight kotlin %}
 
 interface Emphasis {
-    fun emphasis(str: String, placeholder: String, replacement: String): CharSequence
+    fun emphasize(str: String, placeholder: String, replacement: String): CharSequence
 
     companion object : MutableKodeinAware {
         val instance get() = kodein.instance<Emphasis>()
@@ -72,7 +72,7 @@ This is the code of the two classes that implement the above `interface`, each `
 {% highlight kotlin %}
 
 class Bold : Emphasis {
-    override fun emphasis(str: String, placeholder: String, replacement: String): CharSequence {
+    override fun emphasize(str: String, placeholder: String, replacement: String): CharSequence {
         val idName = str.indexOf(placeholder)
         val idEndName = idName + replacement.length
         val boldSpan = StyleSpan(Typeface.BOLD)
@@ -95,7 +95,7 @@ class Bold : Emphasis {
 }
 
 class Italic : Emphasis {
-    override fun emphasis(str: String, placeholder: String, replacement: String): CharSequence {
+    override fun emphasize(str: String, placeholder: String, replacement: String): CharSequence {
         val idName = str.indexOf(placeholder)
         val idEndName = idName + replacement.length
         val boldSpan = StyleSpan(Typeface.ITALIC)
@@ -138,7 +138,7 @@ class BoldFragment : Fragment(), MutableKodeinAware {
         super.onActivityCreated(savedInstanceState)
         kodein.addImport(Bold.MODULE, true)
         text.text = getString(R.string.bold_fragment_prompt)
-                .emphasis(PLACEHOLDER, getString(R.string.bold_fragment_replacement))
+                .emphasize(PLACEHOLDER, getString(R.string.bold_fragment_replacement))
         next_fab.setOnClickListener { nav(R.id.action_firstFragment_to_italicFragment) }
     }
 
@@ -156,7 +156,7 @@ class ItalicFragment : Fragment(), MutableKodeinAware {
         super.onActivityCreated(savedInstanceState)
         kodein.addImport(Italic.MODULE, true)
         text.text = getString(R.string.italic_fragment_prompt)
-                .emphasis(PLACEHOLDER, getString(R.string.italic_fragment_replacement))
+                .emphasize(PLACEHOLDER, getString(R.string.italic_fragment_replacement))
     }
 
     companion object {
@@ -170,13 +170,13 @@ class ItalicFragment : Fragment(), MutableKodeinAware {
 
 The two `Fragment`s select the Kodein module each of them is going to use. (Alternatively, in your code you can select a Kodein module per your flavour or running environment).
 
-Then they use the global `emphasis()` function that takes the placeholder and the replacement and returns a `CharSequence` with an appropriate emphasis:
+Then they use the global `emphasize()` function that takes the placeholder and the replacement and returns a `CharSequence` with an appropriate emphasis:
 
 {% highlight kotlin %}
 
-fun String.emphasis(placeholder: String, replacement: String): CharSequence {
+fun String.emphasize(placeholder: String, replacement: String): CharSequence {
     val emphasis by Emphasis.instance
-    return emphasis.emphasis(this, placeholder, replacement)
+    return emphasis.emphasize(this, placeholder, replacement)
 }
 
 {% endhighlight %}
