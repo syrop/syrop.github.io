@@ -5,7 +5,7 @@ date:   2019-04-06 14:43:00 +0200
 categories: jekyll update
 ---
 
-This is an article about the [MVVM design pattern][mvvm]. It previous articles I erroneously callet it the [MVP pattern][mvp] beacause I misunderstood the role of presenter in the latter.
+This is an article about the [MVVM design pattern][mvvm]. It previous articles I erroneously called it the [MVP pattern][mvp] beacause I misunderstood the role of presenter in the latter.
 
 In the present article I decided to gather the data that I lately scattered among some other articles, most notably I am going to talk abot the [ViewModel][viewmodel] class in Android.
 
@@ -156,7 +156,7 @@ The `class` that extends the `BroadcastReceiver` sets a description (the name) a
 
 At first I was tempted to use an array of `String`s retrieved from the resources, instead of a `when` statement, but then I discovered that according to [`DetectedActivity`][detectedactivity] doco there is no activity for the value of `6`, so I had to stick to retrviewing every `String` individually.
 
-Setting up a `GoogleApiClient` is beyond the scope of this article, so just focus on these two lines at the beginning of the `class` implementation:
+Setting up a [`GoogleApiClient`][googleapiclient] is beyond the scope of this article, so just focus on these two lines at the beginning of the `class` implementation:
 
 {% highlight kotlin %}
 
@@ -421,6 +421,7 @@ I hope that by writing the present article I've exhausted the topic of MVVM, whi
 [channel]: https://kotlinlang.org/docs/reference/coroutines/channels.html
 [kodein]: http://kodein.org/Kodein-DI/
 [detectedactivity]: https://developers.google.com/android/reference/com/google/android/gms/location/DetectedActivity
+[googleapiclient]: https://developers.google.com/android/reference/com/google/android/gms/common/api/GoogleApiClient
 [lazy-viewmodel]: https://syrop.github.io/jekyll/update/2019/02/10/lazy-initialization-of-viewmodel.html
 [jetpack]: https://developer.android.com/jetpack/
 
