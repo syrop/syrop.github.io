@@ -1,0 +1,426 @@
+---
+layout: post
+title:  "MVVM (design pattern)"
+date:   2019-04-06 14:43:00 +0200
+categories: jekyll update
+---
+
+This is an article about the [MVVM design pattern][mvvm]. It previous articles I erroneously callet it the [MVP pattern][mvp] beacause I misunderstood the role of presenter in the latter.
+
+In the present article I decided to gather the data that I lately scattered among some other articles, most notably I am going to talk abot the [ViewModel][viewmodel] class in Android.
+
+## The project
+
+The example used in this article is [MVVM][project].
+
+## Skipping Channels
+
+I am going to use RxJava in this article. I could use coroutines if Kotlin 1.4 was fully out, as it is going to introduce the [`Channel`][channel]. Thanks to that I could introduce producer-consumer patterns using channels, but I do not really understand how to use experimental features in Kotlin, so I will have to wait with it until the introduction of the next version of the programming language. For now I will use the RxJava with its observer pattern, which is slightly different, but even better reflects what I want to show through this article.
+
+## The problem
+
+1. Creation of a model that responds to events on the device (activity recognition).
+2. Creation of a viewmodel that presents the most probable activity and its confidence.
+3. Creation of a mock model that generates test events and is retrieved with inversion of control for the sake of Espresso tests.	
+
+## The structure of the project
+
+I divided the relevant parts (model, view, viewmodel) into corresponding packages, respectively `pl.org.seva.mvvm.model`, `pl.org.seva.mvvm.view` and `pl.org.seva.mvvm.viewmodel`.
+
+In a project for production, where I would probably have plenty of different `ViewModel` classes, I would probably divide them by domain (another package for settings, anothrer for entering and editing data, another for logging in etc.). I wouldn't use package names like 'model' or 'view' at all, although I would use suffix `-ViewModel` in the name of every class that extends the `abstract ViewModel`.
+
+## The data (the model)
+
+The class containing the result (description of the most probable activity and its confidence) of the activity recognition is the following:
+
+{% highlight kotlin %}
+
+data class ActivityDesc(val desc: String, val conf: Int)
+
+{% endhighlight %}
+
+## Activity recognition interface (the model)
+
+This is the interface that contains the `Observable` for the activity recognition:
+
+{% highlight kotlin %}
+
+val ar by instance<ActivityRecognitionObservable>()
+
+interface ActivityRecognitionObservable {
+    val observable: Observable<ActivityDesc>
+}
+
+
+{% endhighlight %}
+
+Notice that there is no `LiveData` above. (It will be only created when I instantiate the `ViewModel`).
+
+The `val ar` before the definition of the `interface` is a global constant that contains the reference to its implementation. It is initiated lazily. The binding that defines how it is done is discussed in the following section.
+
+## Inversion of control
+
+In this article an instance of the `Observable` is retrieved lazily with the help of [Kodein][kodein]. This is the binding:
+
+{% highlight kotlin %}
+
+bind<ActivityRecognitionObservable>() with  singleton { SensorActivityRecognitionObservable(ctx) }
+
+{% endhighlight %}
+
+In the above line of code `ctx` stands for application context.
+
+Another binding for the `ActivityRecognitionObservable` is used for Espresso testing. It will be described later, in a section dedicated to tests.
+
+The following section will describe the implementation of `ActivityRecognitionObservable` using device's sensors.
+
+## Sensor implementation
+
+This is the whole code of the class that recognizes the most probable activity:
+
+{% highlight kotlin %}
+
+class SensorActivityRecognitionObservable(private val ctx: Context) : ActivityRecognitionObservable {
+    private val subject = PublishSubject.create<ActivityDesc>()
+
+    override val observable: Observable<ActivityDesc> = subject
+
+    init {
+        var activityRecognitionReceiver : BroadcastReceiver? = null
+
+        fun registerReceiver() {
+            activityRecognitionReceiver = activityRecognitionReceiver?: Receiver()
+            ctx.registerReceiver(activityRecognitionReceiver, IntentFilter(ACTIVITY_RECOGNITION_INTENT))
+        }
+
+        fun unregisterReceiver() {
+            activityRecognitionReceiver?: return
+            ctx.unregisterReceiver(activityRecognitionReceiver)
+        }
+
+        val googleApiClient = GoogleApiClient.Builder(ctx)
+                .addApi(ActivityRecognition.API)
+                .addConnectionCallbacks(object : GoogleApiClient.ConnectionCallbacks{
+                    override fun onConnected(p0: Bundle?) {
+                        registerReceiver()
+                        val intent = Intent(ACTIVITY_RECOGNITION_INTENT)
+                        val pi = PendingIntent.getBroadcast(
+                                ctx,
+                                0,
+                                intent,
+                                PendingIntent.FLAG_UPDATE_CURRENT)
+                        ActivityRecognition.getClient(ctx).requestActivityUpdates(
+                                ACTIVITY_RECOGNITION_INTERVAL_MS,
+                                pi)
+                    }
+
+                    override fun onConnectionSuspended(p0: Int) = unregisterReceiver()
+                })
+                .build()
+        googleApiClient.connect()
+    }
+
+    private inner class Receiver : BroadcastReceiver() {
+
+        override fun onReceive(context: Context, intent: Intent) {
+            if (ActivityRecognitionResult.hasResult(intent)) {
+                val result = ActivityRecognitionResult.extractResult(intent)!!
+                val activity = result.mostProbableActivity!!
+                val desc = context.getString(when (activity.type) {
+                    DetectedActivity.IN_VEHICLE -> R.string.activity_desc_in_vehicle
+                    DetectedActivity.ON_BICYCLE -> R.string.activity_desc_on_bicycle
+                    DetectedActivity.ON_FOOT -> R.string.activity_desc_on_foot
+                    DetectedActivity.TILTING -> R.string.activity_desc_tilting
+                    DetectedActivity.WALKING -> R.string.activity_desc_walking
+                    DetectedActivity.RUNNING -> R.string.activity_desc_running
+                    else -> R.string.activity_desc_unknown
+                })
+                val confidence = activity.confidence
+                val activityDesc = ActivityDesc(desc, confidence)
+                subject.onNext(activityDesc)
+            }
+        }
+    }
+
+    companion object {
+        private const val ACTIVITY_RECOGNITION_INTENT = "activity_recognition_intent"
+        private const val ACTIVITY_RECOGNITION_INTERVAL_MS = 1000L
+    }
+}
+
+{% endhighlight %}
+
+First lets focus on the actual `BroadcastReceiver`.
+
+The `class` that extends the `BroadcastReceiver` sets a description (the name) and the confidence of the most probable activity.
+
+At first I was tempted to use an array of `String`s retrieved from the resources, instead of a `when` statement, but then I discovered that according to [`DetectedActivity`][detectedactivity] doco there is no activity for the value of `6`, so I had to stick to retrviewing every `String` individually.
+
+Setting up a `GoogleApiClient` is beyond the scope of this article, so just focus on these two lines at the beginning of the `class` implementation:
+
+{% highlight kotlin %}
+
+private val subject = PublishSubject.create<ActivityDesc>()
+
+override val observable: Observable<ActivityDesc> = subject
+
+{% endhighlight %}
+
+The above lines create a private `Subject` and share it out as a a public `Observable`.
+
+## The ViewModel
+
+This is the `abstract` `ViewModel` that is used in the project:
+
+{% highlight kotlin %}
+
+abstract class RxViewModel : ViewModel() {
+    private val cd = CompositeDisposable()
+
+    protected fun <T> disposableLiveData(observable: () -> Observable<T>) = object : LazyDelegate<LiveData<T>> {
+        override fun provideDelegate(receiver: Any?, prop: KProperty<Any?>) = lazy {
+            MutableLiveData<T>().apply {
+                cd.add(observable().subscribe { this.postValue(it) })
+            }
+        }
+    }
+
+    override fun onCleared() {
+        cd.dispose()
+    }
+}
+
+{% endhighlight %}
+
+The above code creates a private instance of `CompositableDisposable` and defines how each instance of `LiveData` is created. The instances of `LiveData` are initiated lazily, and whenever one is created, immediately a `Consumer` is created setting the value on the main thread, and the result is added to the `CompositeDisable`, and the `CompositeDisposable` is disposed when the `ViewModel` is discarded at the end of its lifecycle.
+
+Because both the `ActivityRecognitionObservable` is created lazily in this project, as well as the `LiveData` that is using it, the actual registration of the `BroadcastReceiver` is called only when the `LiveData` is used for the first time when it is observed.
+
+When the `CompositeDisposable` is disposed at the end of `ViewModel`'s lifecycle, it gives a chance to every `Observable` to perform its cleaning up, but I didn't choose to unregister the `BroadcastReceiver` here, because I do not know when it is going to be used the next time. (For instance the device could show another `Fragment` using it, which would create a need to register the `BroadcastReceiver` again. I am not unregistering the `BroadcastReceiver` at all, although I can always add some code to the `ActivityRecognitionObservable` that either unregisters the `BroadcastReceiver` automatically, when the `Observable` is no longer observed, or is to be called manually.
+
+This is the actual implementation that observes the `ActivityRecognitionObservable`:
+
+{% highlight kotlin %}
+
+class ActivityDescViewModel : RxViewModel() {
+    val activityDesc by disposableLiveData { ar.observable }
+}
+
+{% endhighlight %}
+
+## The view
+
+These are the relevant lines of the actual `Fragment` that is using the above `ViewModel`:
+
+{% highlight kotlin %}
+
+override fun onActivityCreated(savedInstanceState: Bundle?) {
+    super.onActivityCreated(savedInstanceState)
+    val vm = provideViewModel<ActivityDescViewModel>()
+    vm.activityDesc(this) {
+        activity_desc.text = it.desc
+        activity_conf.text = it.conf.toString()
+    }
+}
+
+{% endhighlight %}
+
+There is no need to initiate the `ViewModel` lazily in this particular case. The `LiveData` is initiated lazily anyway, so it makes no difference whether you initiate the `ViewModel` lazily or eagerly here. However, in some of my projects I initialize the `ViewModel` lazily, because I want to use it outside of the scope of `onActivityCreated()`. If you want to learn how to do it lazily, you can read a [separate article][lazy-viewmodel] in this blog.
+
+Just this call `provideViewModel<ActivityDescViewModel>()` creates eagerly the instance of `ViewModel`, but doesn't initiate the `LiveData` yet.
+
+This how initialization of the `ViewModel` works under the hood:
+
+{% highlight kotlin %}
+
+inline fun <reified R : ViewModel> Fragment.provideViewModel() = activity!!.provideViewModel<R>()
+
+inline fun <reified R : ViewModel> FragmentActivity.provideViewModel() =
+        ViewModelProviders.of(this).get(R::class.java)
+
+{% endhighlight %}
+
+A subsequent invocation `vm.activityDesc` initiates the `SensorActivityRecognitionObservable`, registers the `BroadcastReceiver`, subscribes to the `Observable` and starts posting values to the `LiveData` being referenced here.
+
+Because you will probably not want to refer to an instance of the `LiveData` thus created inside the `Fragment` in any other way that to actually observing it, I shortened the syntax by creating an extension operator:
+
+{% highlight kotlin %}
+
+operator fun <T> LiveData<T>.invoke(owner: LifecycleOwner, observer: (T) -> Unit) =
+        observe(owner, Observer<T> { observer(it) })
+
+{% endhighlight %}
+
+You can just *invoke* the `LiveData` with a `LifecycleOwner` and an `Observer` and it will *observe* the `LiveData` for you. To remind you a syntax that calls the above `operator` function:
+
+{% highlight kotlin %}
+
+vm.activityDesc(this) {
+    activity_desc.text = it.desc
+    activity_conf.text = it.conf.toString()
+}
+
+{% endhighlight %}
+
+## Running
+
+When you run the application, after about one second you should start seeing the description of the activity recognized by your device's sensors. You can test it manually by shaking the device for a couple of seconds, or you can test it automatically using the way described in the following section.
+
+## Testing
+
+To mock the `ActivityRecognitionObservable` you have to create another binding. This is the module that is creating it:
+
+{% highlight kotlin %}
+
+class MockModuleBuilder {
+    fun build() = Kodein.Module("test") {
+        bind<ActivityRecognitionObservable>(overrides = true) with singleton { MockActivityRecognitionObservable() }
+    }
+}
+
+{% endhighlight %}
+
+This is the implementation:
+
+{% highlight kotlin %}
+
+class MockActivityRecognitionObservable : ActivityRecognitionObservable {
+
+    override val observable: Observable<ActivityDesc> =
+            Observable.interval(1, TimeUnit.SECONDS, Schedulers.io())
+                    .map { if (it % 2L == 0L) ACT1 else ACT2 }
+
+    companion object {
+        const val DESC1 = "on foot"
+        const val CONF1 = 50
+        const val DESC2 = "in vehicle"
+        const val CONF2 = 100
+
+        private val ACT1 = ActivityDesc(DESC1, CONF1)
+        private val ACT2 = ActivityDesc(DESC2, CONF2)
+    }
+}
+
+{% endhighlight %}
+
+This is the code that imports the Kodein module:
+
+{% highlight kotlin %}
+
+class MockApplication : MvvmApplication() {
+
+    init {
+        Kodein.global.addImport(mockModule, allowOverride = true)
+    }
+}
+
+{% endhighlight %}
+
+And the `AndroidJUnitRunner` that starts the above `MockApplication`:
+
+{% highlight kotlin %}
+
+class MockTestRunner : AndroidJUnitRunner() {
+
+    override fun newApplication(
+        cl: ClassLoader, className: String, context: Context): Application =
+        super.newApplication(cl, MockApplication::class.java.name, context)
+}
+
+{% endhighlight %}
+
+To use this particular `AndroidJUnitRunner` you have to register it in your module's level `build.gradle`:
+
+{% highlight groovy %}
+
+defaultConfig {
+    applicationId 'pl.org.seva.myapplication'
+    minSdkVersion 24
+    targetSdkVersion 28
+    versionCode 1
+    versionName '1.0'
+    testInstrumentationRunner 'pl.org.seva.mvvm.mock.MockTestRunner'
+}
+
+{% endhighlight %}
+
+This is the actual test:
+
+{% highlight kotlin %}
+
+@RunWith(AndroidJUnit4::class)
+class ActivityRecognitionTest {
+
+    @Suppress("unused", "BooleanLiteralArgument")
+    @get:Rule
+    val activityRule = ActivityTestRule(MainActivity::class.java, true, true)
+
+    private fun delay(millis: Long) = onView(isRoot()).perform(DelayAction.delay(millis))
+
+    @Test
+    fun testActivityRecognition() {
+        delay(INITIAL_DELAY)
+        onView(withId(R.id.activity_desc)).check(matches(withText(MockActivityRecognitionObservable.DESC1)))
+        onView(withId(R.id.activity_conf)).check(matches(withText(MockActivityRecognitionObservable.CONF1.toString())))
+        delay(INTERVAL)
+        onView(withId(R.id.activity_desc)).check(matches(withText(MockActivityRecognitionObservable.DESC2)))
+        onView(withId(R.id.activity_conf)).check(matches(withText(MockActivityRecognitionObservable.CONF2.toString())))
+    }
+
+    companion object {
+        private const val INITIAL_DELAY = 1500L
+        private const val INTERVAL = 1000L
+    }
+}
+
+{% endhighlight %}
+
+## Delaying an Espresso test
+
+The test described in the above section uses a couple of delays to wait for the simulation to generate another event. This is the `ViewAction` that performs this delay:	
+
+{% highlight kotlin %}
+
+class DelayAction private constructor(private val millis: Long) : ViewAction {
+
+    override fun getConstraints(): Matcher<View> = isRoot()
+
+    override fun getDescription(): String = "wait $millis milliseconds"
+
+    override fun perform(uiController: UiController, view: View) {
+        uiController.loopMainThreadUntilIdle()
+        uiController.loopMainThreadForAtLeast(millis)
+    }
+
+    companion object {
+
+        fun delay(millis: Long): ViewAction = DelayAction(millis)
+    }
+}
+
+{% endhighlight %}
+
+## Conclusion
+
+In the above example you had a chance to learn how to use Kodein to create an `Observable` that reacts to events coming from your sensor. You also could learn how to create a mock implementation.
+
+I used the singleton pattern in conjunction with Kodein to create an Observable that is triggered by an unlimited sequence of events. Although I did not implement it above, I could create a function that stops the `Observable`, invoked either manually or automatically when the last observer unregisters.
+
+I explained how to crate a Kodein module, visible only during tests, that creates bindings for the mock instances.
+
+I decided to use RxJava in the project. I didn't want to create coroutine channels before their implementation becomes stable in Kotlin 1.4.
+
+I used lazy initialization wherever appropriate, in order to only register the `BroadcastReceiver` when it is required to observe an instance of `LiveData`.
+
+I hope that by writing the present article I've exhausted the topic of MVVM, which actually took me a couple of monts to understand and integrate with my present knowledge of [Android Jetpack][jetpack]. By writing this and a couple of previous articles I hope to have demonstrated one man's journey to refining a sensible architecture.
+
+[mvvm]: https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel
+[mvp]: https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter
+[viewmodel]: https://developer.android.com/topic/libraries/architecture/viewmodel
+[project]: https://github.com/syrop/MVVM
+[channel]: https://kotlinlang.org/docs/reference/coroutines/channels.html
+[kodein]: http://kodein.org/Kodein-DI/
+[detectedactivity]: https://developers.google.com/android/reference/com/google/android/gms/location/DetectedActivity
+[lazy-viewmodel]: https://syrop.github.io/jekyll/update/2019/02/10/lazy-initialization-of-viewmodel.html
+[jetpack]: https://developer.android.com/jetpack/
+

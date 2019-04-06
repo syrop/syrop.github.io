@@ -43,9 +43,7 @@ interface MutableKodeinAware : KodeinAware {
     override val kodein get() = mutableKodein
 }
 
-
 {% endhighlight %}
-
 
 ## The interface
 
