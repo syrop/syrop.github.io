@@ -13,7 +13,7 @@ This may remind you of the refactoring I did in the article '[ViewModel and Comp
 
 ## The previous article
 
-You may not understand the present article unless you have read the [previous one][previous] in which I discuss why I decided to discuss `AsyncTask` in the first place.
+You might not understand the present article unless you have read the [previous one][previous] in which I discuss why I decided to discuss `AsyncTask` in the first place.
 
 ## The ViewModel
 
