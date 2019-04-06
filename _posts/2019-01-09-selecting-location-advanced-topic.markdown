@@ -400,7 +400,6 @@ With the knowledge presented in both articles you should be able to display vari
 
 ## Mocking location
 
-
 If you want to learn how to mock location in your projects, you can look at my 2016 project described it the article '[Testing with dependency injection][testing]'. (Please note, however, that that particular project does not use the `MapHolder` pattern).
 
 [victor-events]: https://github.com/syrop/Victor-Events

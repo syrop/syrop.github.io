@@ -103,7 +103,7 @@ class FirstFragment : Fragment() {
 
 ## Donations
 
-If you've enjoyed this article, consider donating some bitcoin at the address below. You can also look at my [donations page][donations].
+If you've enjoyed this article, consider donating some bitcoin at the address below. You may also look at my [donations page][donations].
 
 BTC: bc1qncxh5xs6erq6w4qz3a7xl7f50agrgn3w58dsfp 
 
