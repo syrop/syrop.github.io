@@ -26,11 +26,9 @@ This is the base class of the `ViewModel` that is being discussed in the present
 open class RxViewModel : ViewModel() {
     private val cd = CompositeDisposable()
 
-    protected fun <T> disposableLiveData(observable: Observable<T>) = object : LazyDelegate<LiveData<T>> {
-        override fun provideDelegate(receiver: Any?, prop: KProperty<Any?>) = lazy {
-           MutableLiveData<T>().apply {
-               cd.add(observable.subscribe { this.postValue(it) })
-           }
+    protected fun <T> disposableLiveData(observable: Observable<T>): Lazy<LiveData<T>> = lazy {
+        MutableLiveData<T>().apply {
+            cd.add(observable.subscribe { this.postValue(it) })
         }
     }
 
@@ -42,6 +40,8 @@ open class RxViewModel : ViewModel() {
 {% endhighlight %}
 
 It creates one private instance of `CompositeDisposable` that is disposed when the `ViewModel` is cleared. It also has one `protected` function that lazily creates an instance of `MutableLiveData`. It requires passing an instance of `Observable` and subscribes to it.
+
+Please remember to define the return type of `disposableLiveData()` as `Lazy<LiveData<T>>`. By doing this you hide the real type of the `LiveData()` created here, and therefore it will be seen as immutable by the code that is using it.
 
 This is the way in which the above class is extended:
 

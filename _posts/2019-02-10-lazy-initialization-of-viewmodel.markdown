@@ -7,9 +7,9 @@ categories: jekyll update
 
 This article will explain how to initialize a `ViewModel` using the simplest syntax that has occurred to me so far.
 
-This is the follow-up to [another one][TextInputEditText] in which I already wrote about lazy initialization of `ViewModel`.
+It is the follow-up to [another one][TextInputEditText] in which I already wrote about lazy initialization of `ViewModel`.
 
-This time I believe I found a simple solution. I use it in my projects [Victor-Events][victor-events] and [Wiktor-Navigator][navigator].
+This time I believe I found a simpler solution. I use it in my projects [Victor-Events][victor-events] and [Wiktor-Navigator][navigator].
 
 When you apply this solution, you will only have to write the following code to initialize a `ViewModel` lazily:
 
@@ -23,9 +23,7 @@ Use the following code to create an extention method for `FragmentActivity`:
 
 {% highlight kotlin %}
 
-inline fun <reified R : ViewModel> FragmentActivity.viewModel() = object : LazyDelegate<R> {
-    override fun provideDelegate(receiver: Any?, prop: KProperty<Any?>) = lazy { provideViewModel<R>() }
-}
+inline fun <reified R : ViewModel> FragmentActivity.viewModel() = lazy { provideViewModel<R>() }
 
 inline fun <reified R : ViewModel> FragmentActivity.provideViewModel() =
         ViewModelProviders.of(this).get(R::class.java)
@@ -36,15 +34,29 @@ Use the this code to create an extension method for `Fragment`:
 
 {% highlight kotlin %}
 
-inline fun <reified R : ViewModel> Fragment.viewModel() = object : LazyDelegate<R> {
-    override fun provideDelegate(receiver: Any?, prop: KProperty<Any?>) = lazy { provideViewModel<R>() }
-}
+inline fun <reified R : ViewModel> Fragment.viewModel() = lazy { provideViewModel<R>() }
 
 inline fun <reified R : ViewModel> Fragment.provideViewModel() = activity!!.provideViewModel<R>()
 
 {% endhighlight %}
 
+## Eager mode
+
+You can still initiate a `ViewModel` eagerly when you write:
+
+{% highlight kotlin %}
+
+val eventsModel = provideViewModel<EventsViewModel>()
+
+{% endhighlight %}
+
+## Conclusion
+
+This article demonstrates how to use the [`lazy()`][lazy] function to for lazy initialization of a `ViewModel`.
+
+It also demonstrates how to create an extension function that can be used as an initializer passed as a lambda to [`lazy()`][lazy], so you can instantiate a class both ways.
+
 [victor-events]: https://github.com/syrop/Victor-Events
 [navigator]: https://github.com/syrop/Wiktor-Navigator
 [TextInputEditText]: https://syrop.github.io/jekyll/update/2019/01/17/TextInputEditText-and-LiveData.html
-
+[lazy]: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/lazy.html
