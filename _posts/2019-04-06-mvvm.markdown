@@ -412,6 +412,12 @@ I used lazy initialization wherever appropriate, in order to only register the `
 
 I hope that by writing the present article I've exhausted the topic of MVVM, which actually took me a couple of monts to understand and integrate with my present knowledge of [Android Jetpack][jetpack]. By writing this and a couple of previous articles I hope to have demonstrated one man's journey to refining a sensible architecture.
 
+## Donations
+
+If you've enjoyed this article, consider donating some bitcoin at the address below. You may also look at my [donations page][donations].
+
+BTC: bc1qncxh5xs6erq6w4qz3a7xl7f50agrgn3w58dsfp
+
 [mvvm]: https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel
 [mvp]: https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter
 [viewmodel]: https://developer.android.com/topic/libraries/architecture/viewmodel
@@ -422,4 +428,5 @@ I hope that by writing the present article I've exhausted the topic of MVVM, whi
 [googleapiclient]: https://developers.google.com/android/reference/com/google/android/gms/common/api/GoogleApiClient
 [lazy-viewmodel]: https://syrop.github.io/jekyll/update/2019/02/10/lazy-initialization-of-viewmodel.html
 [jetpack]: https://developer.android.com/jetpack/
+[donations]: https://syrop.github.io/donate/
 
