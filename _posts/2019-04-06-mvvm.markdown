@@ -194,6 +194,8 @@ The above code creates a private instance of `CompositableDisposable` and define
 
 Because both the `ActivityRecognitionObservable` is created lazily in this project, as well as the `LiveData` that is using it, the actual registration of the `BroadcastReceiver` is called only when the `LiveData` is used for the first time when it is observed.
 
+Please remember to define the return type of `disposableLiveData()` as `Lazy<LiveData<T>>`. By doing this you hide the real type of the `MutableLiveData()` created here, and therefore it will be seen as immutable by the code that is using it.
+
 When the `CompositeDisposable` is disposed at the end of `ViewModel`'s lifecycle, it gives a chance to every `Observable` to perform its cleaning up, but I didn't choose to unregister the `BroadcastReceiver` here, because I do not know when it is going to be used the next time. (For instance the device could show another `Fragment` using it, which would create a need to register the `BroadcastReceiver` again. I am not unregistering the `BroadcastReceiver` at all, although I can always add some code to the `ActivityRecognitionObservable` that either unregisters the `BroadcastReceiver` automatically, when the `Observable` is no longer observed, or is to be called manually.
 
 This is the actual implementation that observes the `ActivityRecognitionObservable`:

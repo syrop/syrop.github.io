@@ -41,7 +41,7 @@ open class RxViewModel : ViewModel() {
 
 It creates one private instance of `CompositeDisposable` that is disposed when the `ViewModel` is cleared. It also has one `protected` function that lazily creates an instance of `MutableLiveData`. It requires passing an instance of `Observable` and subscribes to it.
 
-Please remember to define the return type of `disposableLiveData()` as `Lazy<LiveData<T>>`. By doing this you hide the real type of the `LiveData()` created here, and therefore it will be seen as immutable by the code that is using it.
+Please remember to define the return type of `disposableLiveData()` as `Lazy<LiveData<T>>`. By doing this you hide the real type of the `MutableLiveData()` created here, and therefore it will be seen as immutable by the code that is using it.
 
 This is the way in which the above class is extended:
 
