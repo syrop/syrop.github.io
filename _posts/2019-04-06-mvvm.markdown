@@ -265,7 +265,7 @@ vm.activityDesc(this) {
 
 {% endhighlight %}
 
-Alternatively, you can write:
+Alternatively, you may write:
 
 {% highlight kotlin %}
 
