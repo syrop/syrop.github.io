@@ -82,7 +82,7 @@ class ActivityPresenter(
 
 {% endhighlight %}
 
-The presenter really only needs to keep instances to lambdas that are a part of the view. It doesn't need to know more about the view:
+The presenter really only needs to keep references to lambdas that are a part of the view. It doesn't need to know more about the view:
 
 {% highlight kotlin %}
 
