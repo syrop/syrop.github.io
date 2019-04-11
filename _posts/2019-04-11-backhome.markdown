@@ -1,0 +1,116 @@
+---
+layout: post
+title:  "back/home"
+date:   2019-04-11 19:18:00 +0200
+categories: jekyll update
+---
+
+This is an article about handling back and home events when using [Android Jetpack's Navigation component][navigation].
+
+It builds on the contect already presented in the [article][dismissing] in which I was discussing dismissing form data on pressing [Back] and [Home]. The code is slightly changed now to accommodate more possible `Fragment`s in your navigation graph.
+
+## The project
+
+The project I am using it in is [Victor-Events][victor-events], but because it is still work in progress, and it is already rather large now, you will probably want to just focus on the code presented in this article instead of cloning the whole project.
+
+## The Activity
+
+In the present article I will only discuss the code present in one `Activity`. Code inside each particular `Fragment` is not affected at all. You probably also do not have to know the code of the `ViewModel`s I use, as yours will be different.
+
+Its enough to show below the code that gets instances of the `ViewModel`s and the `NavController` for my `Activity`:
+
+{% highlight kotlin %}
+
+private val navController by lazy { findNavController(R.id.nav_host_fragment) }
+
+private val model by viewModel<EventsViewModel>()
+
+private val createEventsViewModel by viewModel<EventCreateViewModel>()
+
+private val commViewModel by viewModel<CommViewModel>()
+
+{% endhighlight %}
+
+In the above code I use a fancy extension function to initiate the `ViewModel`s lazily, discussed in a [separate article][lazy-viewmodel] in this blog.
+
+This is the code of the functions responding to back and home events:
+
+{% highlight kotlin %}
+
+override fun onBackPressed() {
+    if (!backOrHome()) {
+        super.onBackPressed()
+    }
+}
+
+override fun onOptionsItemSelected(item: MenuItem) =
+        if (item.itemId == android.R.id.home) backOrHome() else false
+
+{% endhighlight %}
+
+This is the shortened code of the function that actually handles the events depending on the `Fragment` displayed currently on the screen:
+
+{% highlight kotlin %}
+
+private fun backOrHome(): Boolean {
+    fun showDismissEventDialog() = 
+            if (createEventsViewModel.isFilledIn) {
+		...
+                true
+            }
+            else false
+
+    fun resetCommViewModel(): Boolean {
+        commViewModel.reset()
+        return false
+    }
+
+    return when (navController.currentDestination?.id ?: 0) {
+        R.id.eventCreateFragment -> showDismissEventDialog()
+        R.id.commEditFragment -> resetCommViewModel()
+        else -> false
+    }
+}
+
+{% endhighlight %}
+
+The above function has two little functions inside of it.
+
+The local function I shortened in the above snippet is discussed fully in the [separate article][dismissing]. The other local function just resets the relevant `viewModel()` and always returns `false`.
+
+When `backOrHome()` returns `false` it means that the back or home event hasn't been fully handled, and the operating system still needs to invoke its default function. When `backOrHome()` returns `true` it means that the event has been consumed and the default function will not be invoked. Return `true` each time when you want to block switching to another `Fragment`. In this case I either handle the navigation myself and return `true`, or just invoke a small action on the `ViewModel` and return `false` when I still want Android to return the previous fragment.
+
+## What exactly is currentDestination
+
+`currentDestination` returned by the `NavController` is the id of the `Fragment` that was displayed before the system had a chance to react to your back or home event. Because `currentDestination` may be `null` I set the default value to 0 using the Elvis operator. I chose 0, because according to [documentation][getidentifier] 0 is never a valid resource ID:
+
+> int The associated resource identifier. Returns 0 if no such resource was found. (0 is not a valid resource ID.)
+
+## Conclusion
+
+The present article discussed using `AppCompatActivity`'s standard functions for handling back an home events when you have more than one `Fragment` in your navigation graph.
+
+The only changes needed in the code were inside your `AppCompactActivity`'s implementation.
+
+The article also showed you a practical example of using more than one `ViewModel` inside your `AppCompatActivity` and initiating all of them lazily.
+
+Alternatively, you could try experimenting with [`OnDestinationChangedListener`][listener], but it is beyond the scope of this article.
+
+I particularly like the `when` expression that only requires one line of code per `Fragment` an one line for `else -> false`, and even handles `null`s for you. I hope I have demonstrated that in Kotlin you can create a concise code by using one-line invocations and concealing their implementations inside local functions.
+
+I think that what I've mostly managed to show here is how to share your data between your `Fragment` and your `Activity`, or how to use a lazy initialization of `ViewModel`s so that the `Activity` becomes aware of them only when you press [back] or [home] in that particular `Fragment`, and will never create their instances otherwise.
+
+## Donations
+
+If you've enjoyed this article, consider donating some bitcoin at the address below. You may also look at my [donations page][donations].
+
+BTC: bc1qncxh5xs6erq6w4qz3a7xl7f50agrgn3w58dsfp
+
+[navigation]: https://developer.android.com/guide/navigation/
+[dismissing]: https://syrop.github.io/jekyll/update/2019/01/20/dismissing-form-data.html
+[victor-events]: https://github.com/syrop/Victor-Events
+[lazy-viewmodel]: https://syrop.github.io/jekyll/update/2019/02/10/lazy-initialization-of-viewmodel.html
+[getidentifier]: https://developer.android.com/reference/android/content/res/Resources.html#getIdentifier(java.lang.String,%20java.lang.String,%20java.lang.String)
+[listener]: https://developer.android.com/reference/androidx/navigation/NavController.OnDestinationChangedListener
+[donations]: https://syrop.github.io/donate/
+
