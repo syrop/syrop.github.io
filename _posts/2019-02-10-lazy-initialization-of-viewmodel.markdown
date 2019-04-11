@@ -23,9 +23,9 @@ Use the following code to create an extention method for `FragmentActivity`:
 
 {% highlight kotlin %}
 
-inline fun <reified R : ViewModel> FragmentActivity.viewModel() = lazy { provideViewModel<R>() }
+inline fun <reified R : ViewModel> FragmentActivity.viewModel() = lazy { getViewModel<R>() }
 
-inline fun <reified R : ViewModel> FragmentActivity.provideViewModel() =
+inline fun <reified R : ViewModel> FragmentActivity.getViewModel() =
         ViewModelProviders.of(this).get(R::class.java)
 
 {% endhighlight %}
@@ -34,9 +34,9 @@ Use the this code to create an extension method for `Fragment`:
 
 {% highlight kotlin %}
 
-inline fun <reified R : ViewModel> Fragment.viewModel() = lazy { provideViewModel<R>() }
+inline fun <reified R : ViewModel> Fragment.viewModel() = lazy { getViewModel<R>() }
 
-inline fun <reified R : ViewModel> Fragment.provideViewModel() = activity!!.provideViewModel<R>()
+inline fun <reified R : ViewModel> Fragment.getViewModel() = activity!!.getViewModel<R>()
 
 {% endhighlight %}
 
@@ -46,7 +46,7 @@ You can still initiate a `ViewModel` eagerly when you write:
 
 {% highlight kotlin %}
 
-val eventsModel = provideViewModel<EventsViewModel>()
+val eventsModel = getViewModel<EventsViewModel>()
 
 {% endhighlight %}
 

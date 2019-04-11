@@ -216,7 +216,7 @@ These are the relevant lines of the actual `Fragment` that is using the above `V
 
 override fun onActivityCreated(savedInstanceState: Bundle?) {
     super.onActivityCreated(savedInstanceState)
-    val vm = provideViewModel<ActivityDescViewModel>()
+    val vm = getViewModel<ActivityDescViewModel>()
     vm.activityDesc(this) {
         activity_desc.text = it.desc
         activity_conf.text = it.conf.toString()
@@ -227,15 +227,15 @@ override fun onActivityCreated(savedInstanceState: Bundle?) {
 
 There is no need to initiate the `ViewModel` lazily in this particular case. The `LiveData` is initiated lazily anyway, so it makes no difference whether you initiate the `ViewModel` lazily or eagerly here. However, in some of my projects I initialize the `ViewModel` lazily, because I want to use it outside of the scope of `onActivityCreated()`. If you want to learn how to do it lazily, you can read a [separate article][lazy-viewmodel] in this blog.
 
-Just this call `provideViewModel<ActivityDescViewModel>()` creates eagerly the instance of `ViewModel`, but doesn't initiate the `LiveData` yet.
+Just this call `getViewModel<ActivityDescViewModel>()` creates eagerly the instance of `ViewModel`, but doesn't initiate the `LiveData` yet.
 
 This how initialization of the `ViewModel` works under the hood:
 
 {% highlight kotlin %}
 
-inline fun <reified R : ViewModel> Fragment.provideViewModel() = activity!!.provideViewModel<R>()
+inline fun <reified R : ViewModel> Fragment.getViewModel() = activity!!.getViewModel<R>()
 
-inline fun <reified R : ViewModel> FragmentActivity.provideViewModel() =
+inline fun <reified R : ViewModel> FragmentActivity.getViewModel() =
         ViewModelProviders.of(this).get(R::class.java)
 
 {% endhighlight %}
