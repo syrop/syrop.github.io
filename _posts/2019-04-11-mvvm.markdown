@@ -9,7 +9,7 @@ During my last job interview I was asked about the [MVP pattern][mvp].
 
 ## Why this question?
 
-I think there is no point in using the MVP pattern in production. Why not just subscribe to the viewmodel?
+I think there is no point in using the MVP pattern in production. Why not just observe the viewmodel?
 
 Still, it does makes plenty of sense to ask this particular question during a job interview. If you do not know any viable alternative to MVVM, then how do you know *why* you are using the MVVM pattern in the first place?
 
