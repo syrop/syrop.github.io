@@ -33,7 +33,7 @@ operator fun <T> LifecycleOwner.plus(liveData: MutableLiveData<T>) = HotData(liv
 
 {% endhighlight %}
 
-The above data with the `+` operator using it either way; `MutableLiveData` on the left and `LifecycleOwner` on the right, or the other way round.
+The above `HotData` is created with the `+` operator by using it either way; `MutableLiveData` on the left and `LifecycleOwner` on the right, or the other way round.
 
 ## += operator
 
