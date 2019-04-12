@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Backing TextInputEditText with LiveData (DSL)"
-date:   2019-04-11 19:18:00 +0200
+date:   2019-04-12 19:18:00 +0200
 categories: jekyll update
 ---
 
