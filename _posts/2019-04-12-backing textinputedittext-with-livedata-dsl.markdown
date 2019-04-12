@@ -11,7 +11,7 @@ It is a follow-up to the [previous article][previous-article] in whith I was sol
 
 ## The problem
 
-The problem is how to save all changes made in a form (here: TextInputEditText) immediately into a `MutableLiveData<String>` so that it survives screen orientation changes, switching `Fragment`s and so on.
+The problem is how to save all changes made in a form (here: TextInputEditText) immediately into a `MutableLiveData<String>`, so that it survives screen orientation changes, switching `Fragment`s and so on.
 
 Once your `TextInputEditText` form fields are backed by instances of `MutableLiveData<String>` you may refer to them in your `AppCompatActivity` to react to [Back] and [Home] button in the way presented in a [dedicated article][back-home] in this blog.
 
