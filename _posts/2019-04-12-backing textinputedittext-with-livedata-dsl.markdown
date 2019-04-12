@@ -65,7 +65,7 @@ name.withLiveData(this, model.name)
 
 ## Conclusion
 
-I occasionally enjoy playing with DSLs, although they are nothing more that clever operators, lambdas and so on.
+I occasionally enjoy playing with DSLs, although they are nothing more than clever operators, lambdas and so on.
 
 I took the particular idea of combining objects with a `+` operator from the [`plus` operator][plus] in `kotlinx.coroutines`.
 
