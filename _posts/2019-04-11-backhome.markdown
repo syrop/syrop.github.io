@@ -33,6 +33,14 @@ private val commViewModel by viewModel<CommViewModel>()
 
 In the above code I use a fancy extension function to initiate the `ViewModel`s lazily, discussed in a [separate article][lazy-viewmodel] in this blog.
 
+Please add the following line to your `Activity` to allow your app to handle pressing [Home] (the left arrow in the action bar):
+
+{% highlight kotlin %}
+
+override fun onSupportNavigateUp() = navController.navigateUp()
+
+{% endhighlight %}
+
 This is the code of the functions responding to back and home events:
 
 {% highlight kotlin %}
@@ -43,10 +51,14 @@ override fun onBackPressed() {
     }
 }
 
-override fun onOptionsItemSelected(item: MenuItem) =
-        if (item.itemId == android.R.id.home) backOrHome() else false
+override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+    android.R.id.home -> backOrHome()
+    else -> false
+} || super.onOptionsItemSelected(item)
 
 {% endhighlight %}
+
+The `||` operator in the above code performs a short-circuit evaluation, that is, only in case that the `when` expression evaluates to `false` it proceeds to executing `onOptionsItemSelected()` defined in the `super`. You can use this fact to consume pressing [Home] (the left arrow in the action bar), therefore preventing the user from leaving the `Fragment`. It may come handy if the user has entered some data in the form, and they don't want to loose it. You can read more about dismissing form data a [separate article][dismissing] already mentioned above.
 
 This is the shortened code of the function that actually handles the events depending on the `Fragment` displayed currently on the screen:
 
