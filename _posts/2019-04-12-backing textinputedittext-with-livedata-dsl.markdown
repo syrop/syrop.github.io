@@ -55,7 +55,7 @@ name += model.name + this
 
 (`model.name` in the above code snippet is an instance of `MutableLiveData<String>`, and `this` is a `LifecycleOwner`).
 
-It works identical to the following invocation, already discussed in details in the [previous article][previous-article]:
+It works identically to the following invocation, already discussed in details in the [previous article][previous-article]:
 
 {% highlight kotlin %}
 
