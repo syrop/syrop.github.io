@@ -126,18 +126,32 @@ The value of `last` is updated from another thread, so it can be changed to `nul
 
 ## In the Fragment
 
-This is all it takes to create an instance of the presenter:
+To call it in the `Fragment`, use the following extension function:
 
 {% highlight kotlin %}
 
-ActivityPresenter.build(this) {
-    presentDesc = { activity_desc.text = it }
-    presentConf = { activity_conf.text = it.toString() }
-}
+fun LifecycleOwner.observeActivityRecognition(block: ActivityPresenter.Builder.() -> Unit) =
+        ActivityPresenter.build(this, block)
 
 {% endhighlight %}
 
-Calling `build()` actually subscribes to the RxJava's `Observable` and starts observing the lifecycle of the `Fragment` the code is called from. Altertatively, I could create the instance of the presenter in one function, for example `build()`, and then create another function, for example `observe()`, to start observing the lifecycle. Creating one extra function would promote [separation of concerns][soc], but I decided to stick to only one function in order to promote a more concise code. Your particular architecture choice is up to you.
+Calling `build()` not only creates an instance of `ActivityPresenter` but also starts observing the lifecycle of the receiver (here: `LifecycleObserver`).
+
+Altertatively, I could implement one function `build()` to just create an instance of `ActivityPresenter`, and then write a separate function, for example `observe()`, to start observing the lifecycle. Creating two different functions would promote [separation of concerns][soc], but I decided to stick to only one function in order to promote a more concise code. Your particular architecture choice is up to you.
+
+This is all it takes to start observing activity recognition in the `Fragment`, using the above extension function:
+
+{% highlight kotlin %}
+
+override fun onActivityCreated(savedInstanceState: Bundle?) {
+    super.onActivityCreated(savedInstanceState)
+    observeActivityRecognition {
+        presentDesc = { activity_desc.text = it }
+        presentConf = { activity_conf.text = it.toString() }
+    }
+}
+{% endhighlight %}
+
 
 ## Testing
 
