@@ -13,10 +13,6 @@ In the present article I decided to gather the data that I lately scattered amon
 
 The example used in this article is [MVVM][project].
 
-## Skipping Channels
-
-I am going to use RxJava in this article. I could use coroutines if Kotlin 1.4 was fully out, as it is going to introduce the [`Channel`][channel]. Thanks to that I could introduce producer-consumer patterns using channels, but I do not really understand how to use experimental features in Kotlin, so I will have to wait with it until the introduction of the next version of the programming language. For now I will use the RxJava with its observer pattern, which is slightly different, but even better reflects what I want to show through this article.
-
 ## The problem
 
 1. Creation of a model that responds to events on the device (activity recognition).
