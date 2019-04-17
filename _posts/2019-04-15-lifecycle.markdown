@@ -35,8 +35,6 @@ I usually mention the function `onSaveInstanceState()` when I am asked about `Ac
 
 I think that understanding of the lifecycle is the most important when you use RxJava. You do not want to have subscriptions lying around when the relevant lifecycle ends, although you can clean up after them in the `Activity`'s `onDestroy()` function, the equivalent function in the `Fragment`, so I am not sure whether I should talk about RxJava when I am asked about `Activity` lifecycle specifically, or should I leave discussing RxJava for a more open question, like: 'How to avoid memory leaks?'.
 
-I estimate RxJava to remain extremely relevant to Android at least until Kotlin 1.4 is released. Kotlin 1.4 is going to introduce [Channels][channels], which play a similar role in coroutines as the [`Subject`][subject] does in RxJava - you use channels to pass data between different coroutines.
-
 ## Coroutines
 
 If a coroutine needs to be cancelled when its `Activity` or `Fragment` is destroyed, you can invoke it in `ViewModel`'s extension property [`viewModelScope`][viewmodelscope]. It will cancel the coroutine for you, so you don't have to, and probably shouldn't, handle `Activity` lifecycle events yourself when you are dealing with coroutines.
