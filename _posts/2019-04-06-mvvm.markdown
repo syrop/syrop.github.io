@@ -435,7 +435,6 @@ BTC: bc1qncxh5xs6erq6w4qz3a7xl7f50agrgn3w58dsfp
 [mvp]: https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93presenter
 [viewmodel]: https://developer.android.com/topic/libraries/architecture/viewmodel
 [project]: https://github.com/syrop/MVVM
-[channel]: https://kotlinlang.org/docs/reference/coroutines/channels.html
 [kodein]: http://kodein.org/Kodein-DI/
 [detectedactivity]: https://developers.google.com/android/reference/com/google/android/gms/location/DetectedActivity
 [googleapiclient]: https://developers.google.com/android/reference/com/google/android/gms/common/api/GoogleApiClient

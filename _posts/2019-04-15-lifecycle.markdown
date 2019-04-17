@@ -55,5 +55,4 @@ I think that simply being able to enumerate from your memory a succession of sev
 [lifecycle-doco]: https://developer.android.com/guide/components/activities/activity-lifecycle
 [savedstate]: https://developer.android.com/topic/libraries/architecture/viewmodel-savedstate
 [subject]: http://reactivex.io/documentation/subject.html
-[channels]: https://kotlinlang.org/docs/reference/coroutines/channels.html
 [viewmodelscope]: https://developer.android.com/reference/kotlin/androidx/lifecycle/package-summary#(androidx.lifecycle.ViewModel).viewModelScope:kotlinx.coroutines.CoroutineScope
