@@ -9,13 +9,12 @@ During my last job interview I was asked about the [MVP pattern][mvp].
 
 ## Why this question?
 
-I think there is no point in using the MVP pattern in production. Why not just observe the viewmodel?
+It does makes plenty of sense to ask this particular question during a job interview. If you do not know any viable alternative to MVVM, then how do you know *why* you are using the MVVM pattern in the first place?
 
-Still, it does makes plenty of sense to ask this particular question during a job interview. If you do not know any viable alternative to MVVM, then how do you know *why* you are using the MVVM pattern in the first place?
+Please note I am not very good at implementing the MVP. The MVVM and `LiveData` are my thing. Still, the MVP may be useful when you do need to invoke some code directly on the view. The presenter doesn't need to know about the view, though. You only need to pass to it the actual lambdas you are going to invoke.
 
-Please note I am not very good at implementing the MVP. I only wrote this article, and the example project contained herein, as a refactoring of another project, and only to prove that I - at least to some extent - understand the difference.
 
-MVP may have way more virtue than I currently give it credit for; I just don't understand its most relevant applications.
+I wrote the example project presented in this article as a refactoring of another project to prove that - at least to some extent - I understand the difference between the MVP and the MVVM.
 
 ## The project
 
@@ -126,20 +125,7 @@ The value of `last` is updated from another thread, so it can be changed to `nul
 
 ## In the Fragment
 
-To call it in the `Fragment`, use the following extension function:
-
-{% highlight kotlin %}
-
-fun LifecycleOwner.observeActivityRecognition(block: ActivityPresenter.Builder.() -> Unit) =
-        ActivityPresenter.build(this, block)
-
-{% endhighlight %}
-
-Calling `build()` not only creates an instance of `ActivityPresenter` but also starts observing the lifecycle of the receiver (here: `LifecycleObserver`).
-
-Altertatively, I could implement one function `build()` to just create an instance of `ActivityPresenter`, and then write a separate function, for example `observe()`, to start observing the lifecycle. Creating two different functions would promote [separation of concerns][soc], but I decided to stick to only one function in order to promote a more concise code. Your particular architecture choice is up to you.
-
-This is all it takes to start observing activity recognition in the `Fragment`, using the above extension function:
+This is what it takes to start observing activity recognition in the `Fragment`, using the above extension function:
 
 {% highlight kotlin %}
 
@@ -151,6 +137,19 @@ override fun onActivityCreated(savedInstanceState: Bundle?) {
     }
 }
 {% endhighlight %}
+
+I use the following extension function:
+
+{% highlight kotlin %}
+
+fun LifecycleOwner.observeActivityRecognition(block: ActivityPresenter.Builder.() -> Unit) =
+        ActivityPresenter.build(this, block)
+
+{% endhighlight %}
+
+Calling `build()` not only creates an instance of `ActivityPresenter` but also starts observing the lifecycle of the receiver (here: `LifecycleObserver`).
+
+Altertatively, I could implement one function `build()` to just create an instance of `ActivityPresenter`, and then write a separate function, for example `observe()`, to start observing the lifecycle. Creating two different functions would promote [separation of concerns][soc], but I decided to stick to only one function in order to promote a more concise code. Your particular architecture choice is up to you.
 
 
 ## Testing
