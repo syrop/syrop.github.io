@@ -11,7 +11,7 @@ In this article I discuss the refactoring I made in the [MVVM][mvvm-project] pro
 
 I actually decided to use IntelliJ IDEA 2019.1.1 for this. I've been trying to use Android Studio 3.5 Canary, but it doesn't display the Android perspective correctly when Kotlin 1.3.30 plugin is installed.
 
-The disadvantage of using IntelliJ as opposed to Android Studio 3.5 is such that you can't use the [Apply Changes][apply-changes] functionality. On the other hand, IntelliJ integrates with Mate's Global Application Menu, so I am sticking for now with it.
+The disadvantage of using IntelliJ as opposed to Android Studio 3.5 is such that you can't use [Apply Changes][apply-changes] functionality. On the other hand, IntelliJ integrates with Mate's Global Application Menu, so I am sticking for now with it.
 
 ## The project
 
