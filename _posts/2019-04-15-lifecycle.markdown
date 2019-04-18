@@ -11,7 +11,7 @@ This particular article doesn't propose any design patterns, although it does su
 
 During job interviews I am very often asked about `Activity` lifecycle. It is always `Activity` - never `Fragment`.
 
-I do not really know the answer to this question. During a job interview I could always look up the [documentation][lifecycle-doco], which would only prove to the interviewer that I am able to refer to documentation even during a stressful situation or - better still - have memorized it.
+I do not really know the answer to this question. During a job interview I could always look up the [documentation][lifecycle-doco], which would only prove to the interviewer that I am able to refer to documentation even during a stressful situation or - better still - have memorized some of it.
 
 Still, I am not really sure whether just being able to enumerate the canonical sequence of cycle events makes a good programmer, or a good software architect.
 
@@ -21,7 +21,7 @@ There is a function called `onStart()`, which I have never used in production, a
 
 > The `onStart()` method completes very quickly and, as with the Created state, the activity does not stay resident in the Started state.
 
-This is only about as much as I am able to say the next time somebody asks me about this function.
+This is about as much as I am able to say the next time somebody asks me about this function.
 
 There are two prominnent functions `onResume()` and `onPause()` that may be used to, respectively, start updating the views once the app has been resumed, and stop updating them once the app is off the screen again. Failure to use these functions won't hurt, as updating a view that is not currently visible doesn't crash the app, although pausing the updates may free up some resources. If you are concerned about using you resources while the app is not visible, consider using `LiveData`. All but the last value emitted while the app was paused will be ignored, and the views will be only updated when the app is resumed - without you having to implement the body of `onResume()`.
 
@@ -38,7 +38,6 @@ I think that understanding of the lifecycle is the most important when you use R
 ## Coroutines
 
 If a coroutine needs to be cancelled when its `Activity` or `Fragment` is destroyed, you can invoke it in `ViewModel`'s extension property [`viewModelScope`][viewmodelscope]. It will cancel the coroutine for you, so you don't have to, and probably shouldn't, handle `Activity` lifecycle events yourself when you are dealing with coroutines.
-
 
 ## Conclusion
 
