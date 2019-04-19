@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Coroutines in MVVM"
+title:  "MVVM and coroutines"
 date:   2019-04-18 10:30:00 +0200
 categories: jekyll update
 ---
