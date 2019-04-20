@@ -13,7 +13,7 @@ The parent of this particular coroutine will be a `ViewModel` - as opposed to an
 
 In this article I am discussing a piece of code that is meant to go into production.
 
-I tie together several design patterns I described in a number of my recent articles. Some of the other propositions I made then might be even obsolete by now, which I shall point out when I address them here.
+I tie together several design patterns I described in a number of my recent articles. Some of the other propositions I made then might even be obsolete by now, which I shall point out when I address them here.
 
 The article summarizes my current understanding of Kotlin, and its main advantage over Java - coroutines. I believe that coroutines break Kotlin's inoperability with Java, and once you start applying them, you might not want to, or not be able to return to Java.
 
