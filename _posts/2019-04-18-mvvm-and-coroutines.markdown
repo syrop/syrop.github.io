@@ -15,7 +15,7 @@ The disadvantage of using IntelliJ as opposed to Android Studio 3.5 is such that
 
 ## The project
 
-The project discussed in the present article is [MVP][mvvm-project].
+The project discussed in the present article is [MVVM][mvvm-project].
 
 I overwrote the code discussed in the [previous article][mvvm-article], but you can still watch the git history to see which changes exactly I made.
 
