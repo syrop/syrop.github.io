@@ -5,7 +5,7 @@ date:   2019-04-24 21:53:00 +0200
 categories: jekyll update
 ---
 
-This article shows how to refactor the code handling permissions.
+This article shows how I refactored the code that is handling permissions in my [project][victor-events].
 
 ## Previous articles
 
@@ -222,7 +222,7 @@ There isn't much benefit in refactoring RxJava to coroutines in this simple case
 
 If RxJava is already being used in your project for other things, and you don't have to add this dependency only for the sake of permissions, then probably both the present solution and the [previous one][permissions-article] are equally fine.
 
+[victor-events]: https://github.com/syrop/Victor-Events
 [permissions-article]: https://syrop.github.io/jekyll/update/2018/12/26/permissions-rxjava-and-lifecycle.html
 [mapholder-article]: https://syrop.github.io/jekyll/update/2019/01/09/selecting-location-advanced-topic.html
-[victor-events]: https://github.com/syrop/Victor-Events
 
