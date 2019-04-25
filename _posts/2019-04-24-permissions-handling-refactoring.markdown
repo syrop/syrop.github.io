@@ -210,7 +210,7 @@ private fun Fragment.untilDestroy(work: () -> Job) = work().apply {
 
 {% endhighlight %}
 
-Notice the function `Fragment.untilDestroy()` that creates an insnance of `Job`, and then creates a `LifeCycleObserver` to cancel the `Job` on screen rotation. The `Job` is already managed by the `viewModelScope` of `Permissions.ViewModel`.
+Notice the function `Fragment.untilDestroy()` that creates an insnance of `Job`, and then creates a `LifeCycleObserver` to cancel the `Job` on screen rotation. The `Job` is already being managed by the `viewModelScope` of `Permissions.ViewModel`.
 
 ## Conclusion
 
