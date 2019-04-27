@@ -380,9 +380,7 @@ To tag the scheduled work I just used the string `this::class.java.name`, becaus
 
 I recommend the reader experiments with the `CoroutineWorker`, or several extension functions taking in a `suspend` block of code, or a block of code that requires a `CoroutineScope`.
 
-Before I wrote the present article I did have some idea that `WorkManager` might be used to refresh data periodically, but I didn't fully know how to take advantage of it.
-
-I should be able now to discuss the repository pattern, or refreshing the data it holds, in very fine details.
+Before I wrote the present article I did have some idea that `WorkManager` might be used to periodically refresh data, but I didn't fully understand how. I should currently be able to discuss the repository pattern - or refreshing data held in the data structure - in much finer details.
 
 I recomment the reader writes articles about several of their favorite design patterns, or the refactorings they have carried out in their projects. The reader might thus improve their communication skills and be better prepared to talk to other people about the way they see good coding practices, or what they generally want to achieve when they write programs.
 
