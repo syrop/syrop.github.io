@@ -9,7 +9,7 @@ This article shows how you can periodically (every so many hours) refresh your d
 
 Alternatively, you could listen to the updates in real time, but this technique is not going to be discussed in this article.
 
-## Previous articles
+## Previous article
 
 Repository pattern was already discussed in [another article][repository-article]. Then I was discussing how to observe an instance of `LiveData` to display the fresh data in the GUI. I have since refactored the project to also watch changes in the repository over the `BroadcastChannel`. This refactoring will be discussed further in the present article.
 
