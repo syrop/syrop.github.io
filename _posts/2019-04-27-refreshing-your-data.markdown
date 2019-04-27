@@ -318,7 +318,7 @@ class CommSyncWorker(private val context: Context, params: WorkerParameters) : C
                 .map { Message(
                         LocalDateTime.now(),
                         context.getString(R.string.system_message_comm_deleted)
-                                .replace(NAME_PLACEHOLDER, it.name)) }
+                                .replace(NAME_PLACEHOLDER, it.originalName)) }
                 .apply {
                     messages add this
                     messageDao add this
@@ -335,7 +335,7 @@ class CommSyncWorker(private val context: Context, params: WorkerParameters) : C
 
 {% endhighlight %}
 
-The above `ListenableWorker` uses `Dispatchers.IO` to runs the work. It refreshes the list of communities in the way already described above. From the generated list it takes the dummy items (deleted communities), and for each one of them creates a system message informing the user that the community they have been watching has been deleted. The system messsages are stored in a separate repository, beyond the scope of the present article.
+The above `ListenableWorker` uses `Dispatchers.IO` to runs the work. It refreshes the list of communities in the way already described above. From the generated list it takes the dummy items (deleted communities), and for each one of them creates a system message informing the user that the community they had been watching was deleted. The system messsages are stored in a separate repository, beyond the scope of the present article.
 
 ## Scheduling the work
 
