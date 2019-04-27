@@ -111,7 +111,7 @@ Thanks to that, and because I used `suspendCancellableCoroutine` when I defined 
 
 The following section will show how to run a `suspend` function in a `CoroutineContext` of its container `ViewModel`. Thank to that every coroutine will be canceled when the `ViewModel` itself is cleared.
 
-## The viewmodel
+## The ViewModel
 
 These are the relevant lines of the `ViewModel` that is calling this coroutine:
 
