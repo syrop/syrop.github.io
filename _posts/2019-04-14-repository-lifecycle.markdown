@@ -9,9 +9,9 @@ This article explains how to configure a repository so that it notifies its obse
 
 ## The problem
 
-1. The repository shall return normal objects and their collections, as opposed to only data wrapped in `LiveData`.
-2. It shall also contain different properties and operators.
-3. Other code can request such data from the repository.
+1. The repository shall return normal objects and their collections.
+2. `LiveData` shall be only used to notify the view that there has been a change.
+3. When there has been a change, the view may request data from the repository, using normal getters.
 4. The repository doesn't know anything about the view.
 
 I am using a different approach from the one presented in [the article][mvvm-article] in this blog, which explains the [MVVM pattern][mvvm], as my `ViewModel` there held all of the relevant data wrapped in instances of `LiveData`. This time `LiveData` will be only used to prompt the view to ask the repository for the data it wants to display.
