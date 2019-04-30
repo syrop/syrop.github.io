@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Repository and DSL (refactoring)"
-date:   2019-04-29 20:22:00 +0200
+date:   2019-04-30 06:08:00 +0200
 categories: jekyll update
 ---
 
@@ -64,7 +64,9 @@ class CommViewModel : ViewModel() {
 
 {% endhighlight %}
 
-I hope I don't have to explain how `LiveData` works. I will just focus on what I did to launch the observation. This is the function that combines the repository with the `CoroutineScope` and invokes the blok each time there is a change, as long as the `CoroutineScope` hasn't been canceled:
+I hope I don't have to explain how `LiveData` works. I will just focus on what I did to launch the observation.
+
+This is the function that captures the `ViewModel` into a lambda:
 
 {% highlight kotlin %}
 
@@ -74,7 +76,7 @@ infix fun vm(vm: ViewModel) = { block: () -> Unit ->
 
 {% endhighlight %}
 
-The above `infix` function retrieves the `CoroutineScope` from the `ViewModel`, and captures it into a lambda it returns. The lambda is then launched insine the `ViewModel` with another lambda:
+The above `infix` function returns a lambda that is launched inside the `ViewModel` with another lambda:
 
 {% highlight kotlin %}
 
@@ -100,7 +102,7 @@ suspend operator fun invoke(block: () -> Unit) {
 
 What the above code does it firsts opens a subscription on the `BroadcastChannel`. It checks whether the channel already contains data, and removes it if it does. (It doesn't remove the value from the parrent `BroadcastChannel`). Then, as long as the `CoroutineScope` hasn't been canceled it waits for subsequent values and calls invokes the `block`.
 
-## Conclusion
+## Recap
 
 The present refactoring allowed me to shorten the original line:
 
@@ -124,10 +126,61 @@ The code snippets presented above are probably not enough for the reader to unde
 
 The reader might also use their browser to view the changes discussed in the present particle in their corresponding [commit][commit].
 
+## Fixing a memory leak
 
+Don't forget to close the `Channel`s! The above code snippets contain a simplified code that may lead to `Channel` leaks. This may happen because I open a new `Channel` for every `ViewModel` that wants to take advantage of the repository. Notice the code of `ConflatedBroadcastChannel` I use:
+
+{% highlight kotlin %}
+
+@Suppress("UNCHECKED_CAST")
+public override fun openSubscription(): ReceiveChannel<E> {
+    val subscriber = Subscriber(this)
+    _state.loop { state ->
+        when (state) {
+            is Closed -> {
+                subscriber.close(state.closeCause)
+                return subscriber
+            }
+            is State<*> -> {
+                if (state.value !== UNDEFINED)
+                    subscriber.offerInternal(state.value as E)
+                val update = State(state.value, addSubscriber((state as State<E>).subscribers, subscriber))
+                if (_state.compareAndSet(state, update))
+                    return subscriber
+            }
+            else -> error("Invalid state $state")
+        }
+    }
+}
+
+{% endhighlight %}
+
+Implementation of the function `openSubscription()` creates a `Subscriber` and stores a reference to it by calling `addSubscriber()`. The reference is only removed when the `Subscriber` cancels.
+
+This is the corrected version of my code, which cancels the `Channel` when the relevant `CoroutineScope` is canceled, which happens always when the correspoding `ViewModel` is cleared:
+
+{% highlight kotlin %}
+
+suspend operator fun invoke(block: () -> Unit) {
+    with (channel.openSubscription()) {
+        if (!isEmpty) receive()
+        try {
+            while (true) {
+                receive()
+                block()
+            }
+        } finally { cancel() }
+    }
+}
+
+{% endhighlight %}
+
+When the `ViewModel` is cleared, and its corresponding `CoroutineScope` is canceled, the above function `receive()` will throw a `CancellationException`. It will prevent further execution of any code in the `try` block, so that the `Channel` created during the the invocation of `openSubscription()` may be only canceled in the `finally` block.
+
+The reader might want to refer to the [commit][fix-commit] corresponding to the above fix.
 
 [repository-article]: https://syrop.github.io/jekyll/update/2019/04/14/repository-lifecycle.html
 [refreshing-article]: https://syrop.github.io/jekyll/update/2019/04/27/refreshing-your-data.html
 [victor-events]: https://github.com/syrop/Victor-Events
 [commit]: https://github.com/syrop/Victor-Events/commit/0343b1149a38a928b68bc1396de6d791316d2979
-
+[fix-commit]: https://github.com/syrop/Victor-Events/commit/c3a1da294f6e757e0b03f163f69dd9ff54d36c32
