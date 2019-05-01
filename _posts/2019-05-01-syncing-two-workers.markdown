@@ -104,10 +104,6 @@ W/System.err:     at kotlinx.coroutines.scheduling.CoroutineScheduler.runSafely(
 
 The above dump clearly shows that the constant `syncMutex` is initiated inside of a coroutine. I initially thought that I would gave to wrap `Mutex()` in a `lazy` delegate, I even [committed][lazy-commit] my change, but when I performed the tests documented here I returned to the previous version of my code.
 
-In the first version of my code `syncMutex` used an eager initialization, but I made it lazy in the [last commit][lazy-commit], because it just as well might be initialized when the work is run for the first time. The way I am scheduling my works now is they are going to be run immediately on enqueueing, but at least my `syncMutex` is going to be initialized lazily from within a coroutine run with `Dispatchers.IO`, so it should offload the main thread just a little bit.
-
-The sequence of calling `coroutineScope` and `syncMutex.withLock()` is arbitrary
-
 ## The CoroutineWorker
 
 This is the entire code of the CoroutineWorker (subclass of ListenableWorker):
