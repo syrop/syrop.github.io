@@ -33,7 +33,8 @@ fun boot() {
     io {
         listOf(
             launch { comms.fromDb() },
-            launch { messages.fromDb() })
+            launch { messages.fromDb() },
+            launch { events.fromDb() })
                 .joinAll()
         scheduleSync<CommSyncWorker>(CommSyncWorker.TAG, CommSyncWorker.FREQUENCY)
         scheduleSync<EventSyncWorker>(EventSyncWorker.TAG, EventSyncWorker.FREQUENCY)
@@ -50,7 +51,7 @@ fun io(block: suspend CoroutineScope.() -> Unit) = GlobalScope.launch(Dispatcher
 
 {% endhighlight %}
 
-What the `boot()` function does is it first launches two `Job`s that read contents of two repositories from a local database, and waits for them to join.
+What the `boot()` function does is it first launches three `Job`s that read contents of two repositories from a local database, and waits for them to join.
 
 It then schedules enqueues two different works with the same sets of constraints.
 
