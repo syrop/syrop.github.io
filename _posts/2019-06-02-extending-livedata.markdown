@@ -164,6 +164,16 @@ class RotationChannelFactory(ctx: Context) {
 
 The reader can learn the meaning of the above code from the [getOrientation()][get-orientation] doco, as well as from [overview of the sensors][sensors-overview].
 
+The noteworthy part of the above code is the use of the Elvis `?:` operator. The [`getRotationMatrix()`][get-rotation-matrix] function cannot have any of its last two parameters set to `null`, yet two of the arrays may be set at two different times, in an unknown order, and are otherwise `null`.
+
+The Elvis operator above checks whether either of the values is `null`, and `return`s if it is.
+
+Because both `return` statements are inside a function `onSensorChanged()`, and not inside a lambda, they can be called by themselves, and they will `return` from the function before `SensorManager.getRotationMatrix()` is invoked, and therefore prevent a `NullPointerException`.
+
+You may notice that at the top of the above code block, in the first line of the implementation of `getRotationChannel()`, there is another type of `return` statement: `return@also`. It is so because this statement is inside a lambda, so the `@` label is an indication that the `return` statement only `returns` from the lambda, and not from the entire function.
+
+Even though the two other `return` statements are also inside of the same lambda, they belong to a separate class, and to a separate function, and may be therefore written without a `@` label.
+
 ## LiveData
 
 This is the code that calculates the distance to the chosen destination, as well as the direction:
@@ -371,6 +381,7 @@ BTC: bc1qncxh5xs6erq6w4qz3a7xl7f50agrgn3w58dsfp
 [permissions]: https://syrop.github.io/jekyll/update/2018/12/26/permissions-rxjava-and-lifecycle.html
 [permissions-refactoring]: https://syrop.github.io/jekyll/update/2019/04/24/permissions-handling-refactoring.html
 [get-orientation]: https://developer.android.com/reference/android/hardware/SensorManager.html#getOrientation(float[],%20float[])
+[get-rotation-matrix]: https://developer.android.com/reference/android/hardware/SensorManager.html#getRotationMatrix(float[],%20float[],%20float[],%20float[])
 [sensors-overview]: https://developer.android.com/guide/topics/sensors/sensors_overview
 [flat-earthers]: https://en.wikipedia.org/wiki/Flat_Earth#Modern_Flat-Earthers
 [donations]: https://syrop.github.io/donate/
