@@ -84,7 +84,7 @@ However, I can avoid allocating any memory at all by simply using a value that i
 
 ```kotlin
 private val unit = Unit
-inline val <reified T> KodeinProperty<T>.value get() = provideDelegate(null, ::unit).value
+val <T> KodeinProperty<T>.value get() = provideDelegate(null, ::unit).value
 ```
 
 The [reflection documentation][reflection] does't say that I can create a reference to an object (here: `Unit`) directly. However, I can create any property that is initiated with that object, and create a reference to it using the `::` operator (which automatically creates an instance of `KProperty`).
@@ -122,7 +122,7 @@ I found this solution more by analyzing the code of `Kodein` than by reading a p
 
 [kodein]: https://kodein.org/Kodein-DI/?6.2/core
 [victor-events]: https://github.com/syrop/Victor-Events
-[commit]: https://github.com/syrop/Victor-Events/commit/4c288b93fe638ce0bc8a747d3eda70466e5086dc
+[commit]: https://github.com/syrop/Victor-Events/commit/a3e8fdc1d1a797bdaa1fd549a2c9d812cd23c7f8
 [logging]: https://syrop.github.io/jekyll/update/2018/12/30/logging.html
 [delegated-properties]: https://kotlinlang.org/docs/reference/delegated-properties.html
 [lazy]: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-lazy/index.html
