@@ -9,7 +9,7 @@ This article explains how to write your own implementation of `LiveData`.
 
 ## The project
 
-The project used in this article is [Compass]. It is available on [Google Play][compass-play] (pending approval by Google).
+The project used in this article is [Compass]. It is available on [Google Play][compass-play].
 
 The app first displays a compass. When the user clicks on an empty *Address* field, Google Map is shown where the user can enter their destination location by long-pressing anywhere on the map. When destination is thus selected, the home screen will display the destination's street address, current distance and a large arrow indicating the direction on the top of the compass.
 

@@ -21,7 +21,7 @@ Thanks to doing that there is less code that deals with sensitive asynchronous o
 
 ## The project
 
-The project used in this article is [Compass]. It is available on [Google Play][compass-play] (pending approval by Google).
+The project used in this article is [Compass]. It is available on [Google Play][compass-play].
 
 You can see this particular refactoring discussed in the present article in a [commit].
 
@@ -95,11 +95,9 @@ I hope that by performing and documenting this refoctoring I've clarified how to
 
 I have also tried to further promote separation of concerns, so that the instances of `LiveData` do not have to be aware of the `viewModelScope`, but instead use `LiveDataScope` from `lifecycle-livedata-ktx`.
 
-The project is at the moment finished, so I do not expect further impromements in the code, and at the moment I do not see a need to introduce these changes into my main project, [Victor Events][events].
+The project is at the moment finished, so I do not expect further impromements in the code, and at the moment I do not see a need to introduce these changes into my main project - [Victor Events][events].
 
 I hope, however, that by writing the present article I've provided a demonstration on how to document an instance of [refactoring][commit], so that other developers may understand the author's rationale for the changes, which can help them to decide whether they want to keep them, build on them or revoke them.
-
-
 
 [livedata]: https://developer.android.com/topic/libraries/architecture/coroutines#livedata
 [youtube]: https://youtu.be/BOHK_w09pVA?t=948
