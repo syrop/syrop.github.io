@@ -69,7 +69,7 @@ override fun cancel(cause: CancellationException?) {}
 
 The above line of code literally does nothing, so off course children of this [`Job`][job] will not be canceled when this empty implementation of `cancel()` is called.
 
-I wrote some dummy code to demonstrate the behavior of `NonCancellable` in my playground project. The reader can still see it in a [commit][commit-playground]:
+I wrote some dummy code to demonstrate the behavior of `NonCancellable` in my playground project. One can still see it in a [commit][commit-playground]:
 
 ```kotlin
 GlobalScope.launch {
