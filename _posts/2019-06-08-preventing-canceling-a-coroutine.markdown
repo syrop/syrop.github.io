@@ -67,18 +67,18 @@ Still, Kotlin allows fluently switching a `CoroutineContext` without launching a
 override fun cancel(cause: CancellationException?) {}
 ```
 
-The above line of code literally does nothing, so off course children of this [`Job`][job] will not be canceled when this empty implementation of `cancel()` is called.
+The above line of code literally does nothing, so of course children of this `Job` will not be canceled when this empty implementation of `cancel()` is called.
 
 I wrote some dummy code to demonstrate the behavior of `NonCancellable` in my playground project. One can still see it in a [commit][commit-playground]:
 
 ```kotlin
 GlobalScope.launch {
-        val scope = CoroutineScope(Job() + Dispatchers.Main)
-        scope.launch {
-            withContext(NonCancellable) {
-                println("wiktor inside the block")
-                delay(2000)
-		yield()
+    val scope = CoroutineScope(Job() + Dispatchers.Main)
+    scope.launch {
+        withContext(NonCancellable) {
+            println("wiktor inside the block")
+            delay(2000)
+            yiield()
                 println("wiktor finished successfully")
             }
             yield()
