@@ -128,7 +128,7 @@ private suspend fun refresh(transform: suspend (Comm) -> Comm): List<Comm> =
         }
 ```
 
-First, the reader will noticed that I used the construction:
+First, the reader will noticed that I use the syntax:
 
 ```kotlin
 withContext(NonCancellable + Dispatchers.Main)
