@@ -221,7 +221,7 @@ I tried to demonstrate thru this article how to simultaneously use three levels 
 
 ## Donations
 
-If you've enjoyed this article, you may want to donate some bitcoin at the address presented below. You may also look at my [donations page][donations].
+If the reader has enjoyed the present article, they may want to donate some bitcoin at the address presented below. Readers may also look at my [donations page][donations].
 
 BTC: bc1qncxh5xs6erq6w4qz3a7xl7f50agrgn3w58dsfp
 
