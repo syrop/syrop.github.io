@@ -17,7 +17,7 @@ When the user taps on one of such platforms, they are driven to a `Fragment` dis
 
 ## The project
 
-The project is [Launch Pads][launchpads]. It is also available on [Google Play].
+The project is [Launch Pads][launchpads]. It is also available on [Google Play][play].
 
 I use Retrofit 2.6.0, because it allows running asynchronous requests by adding the `suspend` keyword to each function. This the dependency:
 
