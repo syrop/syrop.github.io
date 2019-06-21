@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Setting dependencies in a constructor"
+title:  "Setting dependencies in the constructor"
 date:   2019-06-20 13-38 +0200
 categories: jekyll update
 ---
