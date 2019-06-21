@@ -74,7 +74,7 @@ I performed this change in order to use the `ViewModel` without having to reconf
 
 ## Donations
 
-If the reader has enjoyed the present article, they may want to donate some bitcoin at the address presented below. Readers may also look at my [donations page][donations].
+If the reader has enjoyed the present article, they may want to donate some bitcoin at the address presented below. Readers may also look at my [donations page][donate].
 
 BTC: bc1qncxh5xs6erq6w4qz3a7xl7f50agrgn3w58dsfp
 
@@ -83,3 +83,5 @@ BTC: bc1qncxh5xs6erq6w4qz3a7xl7f50agrgn3w58dsfp
 [injection-retrieval]: https://kodein.org/Kodein-DI/?6.2/core#_injection_retrieval
 [viewmodel]: https://kodein.org/Kodein-DI/?6.2/android#view-model-factory
 [ticket]: https://github.com/syrop/syrop.github.io/issues
+[donate]: https://syrop.github.io/donate/
+
