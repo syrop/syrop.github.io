@@ -1,14 +1,14 @@
 ---
 layout: post
-title:  "Testing with dependency injection"
+title:  "Testing with dependency retrieval"
 date:   2018-12-25 14:03:19 +0100
 categories: jekyll update
 ---
-In this article I will explain how to use dependency injection for testing.
+In this article I will explain how to use dependency retrieval for testing.
 
 In the article I use code snippets from the project [GPS-Texter][texter]. This application sends a text message each time distance from home location changes by 2 kilometres. In the test run I will use a mock location hardcoded in a test class, and instead of really sending text messages I will just count how many times the application was trying to send them and compare this number with the expected value.
 
-For dependency injection I use [Kodein][kodein-di].
+For dependency retrieval I use [Kodein][kodein-di].
 
 To use Kodein in your project, add the relevant dependencies:
 
@@ -238,9 +238,9 @@ class LocationTest {
 
 {% endhighlight %}
 
-Because thus configured application uses the injected mock location simulator and mock text messages sender, the sent messages counter will be incremented so many times by the app itself, and no further steps need to be performed in the JUnit test.
+Because thus configured application uses the retrieved mock location simulator and mock text messages sender, the sent messages counter will be incremented so many times by the app itself, and no further steps need to be performed in the JUnit test.
 
-Android Espresso is used herein only for waiting a specified amount of seconds. All other actions, like simulating location changes, and counting the sent messages, are performed by the injected objects inside of the tested application.
+Android Espresso is used herein only for waiting a specified amount of seconds. All other actions, like simulating location changes, and counting the sent messages, are performed by the retrieved objects inside of the tested application.
 
 [texter]: https://github.com/syrop/GPS-Texter
 [kodein-di]: https://kodein.org/di/
