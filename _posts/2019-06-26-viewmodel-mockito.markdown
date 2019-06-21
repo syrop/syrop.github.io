@@ -55,7 +55,7 @@ Without `open` next to the class name the test simply wouldn't compile. Without 
 
 ## Testing
 
-[Doco] recommends using [`runBlockingTest()`][runblockingtest], which modifies the `CoroutineDispatcher`, so that whenever `delay()` is called, it doesn't wait, but proceeds immediately to the next line. I can't use that, because in the code I use some computationally-intensive calculations, such as measuring the distance between two points. I do need `delay()` to wait several milliseconds, so I can't do that. I decided to use `runBlocking()` instead:
+[Doco] recommends using [`runBlockingTest()`][runblockingtest], which modifies the `CoroutineDispatcher`, so that whenever `delay()` is called, it doesn't wait, but proceeds immediately to the next line. I can't use that, because in the code I use some computationally-intensive calculations, such as measuring the distance between two points. I do need `delay()` to wait several milliseconds, so I can't do that. I decided to use [`runBlocking()`][runblocking] instead:
 
 ```kotlin
 @Test
@@ -174,6 +174,7 @@ BTC: bc1qncxh5xs6erq6w4qz3a7xl7f50agrgn3w58dsfp
 [dispatchers]: https://github.com/Kotlin/kotlinx.coroutines/tree/master/kotlinx-coroutines-test
 [doco]: https://github.com/Kotlin/kotlinx.coroutines/tree/master/kotlinx-coroutines-test
 [runblockingtest]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-test/kotlinx.coroutines.test/run-blocking-test.html
+[runblocking]: https://kotlin.github.io/kotlinx.coroutines/kotlinx-coroutines-core/kotlinx.coroutines/run-blocking.html
 [testing]: https://syrop.github.io/jekyll/update/2018/12/25/testing-with-dependency-retrieval.html
 [donate]: https://syrop.github.io/donate/
 
