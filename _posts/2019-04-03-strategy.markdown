@@ -188,7 +188,7 @@ I wrote it to answer a curious question whether it was possible in Kotlin to wri
 [strategy-pattern]: https://en.wikipedia.org/wiki/Strategy_pattern
 [kodein]: http://kodein.org/Kodein-DI/
 [kodein-documentation]: https://github.com/EasyKotlin/Kodein/blob/master/DOCUMENTATION_V3.adoc#mutating
-[testing]: https://syrop.github.io/jekyll/update/2018/12/25/testing-with-dependency-injection.html
+[testing]: https://syrop.github.io/jekyll/update/2018/12/25/testing-with-dependency-retrieval.html
 [strategy]: https://github.com/syrop/Strategy
 [dry]: https://en.wikipedia.org/wiki/Do_not_repeat_yourself
 

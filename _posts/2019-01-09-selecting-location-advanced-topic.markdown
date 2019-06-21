@@ -320,7 +320,7 @@ I use `Geocoder` to obtain the string representation of the location (here: the 
 
 Obtaining an instance of `GeoCoder` requires passing an instance of `Context` in its constructor, so if I wanted I could create one once the `InteractiveMapHolder` is initiated with its parent `Fragment` in the function `withFragment`.
 
-Instead of doing that I chose to use dependency injection (or dependency retrieval) with [Kodein][kodein]:
+Instead of doing that I chose to use dependency retrieval with [Kodein][kodein]:
 
 {% highlight kotlin %}
 
@@ -328,7 +328,7 @@ private val geocoder: Geocoder = instance()
 
 {% endhighlight %}
 
-If you want to read other articles in this blog about this Kotlin-specific dependency injection library, you can look at my documentation of the design patterns I use for [testing][testing] and [logging][logging] in my projects.
+If you want to read other articles in this blog about this Kotlin-specific dependency retrieval library, you can look at my documentation of the design patterns I use for [testing][testing] and [logging][logging] in my projects.
 
 When configuring Kodein binding for `Geocoder` I use the following line of code:
 
@@ -400,14 +400,14 @@ With the knowledge presented in both articles you should be able to display vari
 
 ## Mocking location
 
-If you want to learn how to mock location in your projects, you can look at my 2016 project described it the article '[Testing with dependency injection][testing]'. (Please note, however, that that particular project does not use the `MapHolder` pattern).
+If you want to learn how to mock location in your projects, you can look at my 2016 project described it the article '[Testing with dependency retrieval][testing]'. (Please note, however, that that particular project does not use the `MapHolder` pattern).
 
 [victor-events]: https://github.com/syrop/Victor-Events
 [displaying-google-maps]: https://syrop.github.io/jekyll/update/2018/12/28/displaying-google-maps.html
 [jetpack]: https://developer.android.com/jetpack/
 [navigation-article]: https://syrop.github.io/jekyll/update/2018/12/26/architecture-components-and-searching.html
 [kodein]: http://kodein.org/Kodein-DI/
-[testing]: https://syrop.github.io/jekyll/update/2018/12/25/testing-with-dependency-injection.html
+[testing]: https://syrop.github.io/jekyll/update/2018/12/25/testing-with-dependency-retrieval.html
 [logging]: https://syrop.github.io/jekyll/update/2018/12/30/logging.html
 [geocoder-google]: https://developer.android.com/training/location/display-address
 [kodeinmodulebuilder]: https://github.com/syrop/Victor-Events/blob/master/events/src/main/kotlin/pl/org/seva/events/main/KodeinModuleBuilder.kt

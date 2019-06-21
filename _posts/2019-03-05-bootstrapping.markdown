@@ -7,7 +7,7 @@ categories: jekyll update
 
 This is an article about how to initialize (bootstrap) an Android app written in Kotlin.
 
-It will also give hints on how to configure a [Kodein][kodein] module for dependency injection.
+It will also give hints on how to configure a [Kodein][kodein] module for dependency retrieval.
 
 The code used in this article is presently used in my project [Victor Events][victor-events].
 

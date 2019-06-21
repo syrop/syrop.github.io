@@ -49,7 +49,7 @@ override fun onCreate() {
 
 Because it is an extention function, an instance of your application `Context` will be automatically passed to it.
 
-If you want to use a more advanced design pattern to initialize your application, together with dependency injection, you can create an instance of the class `Bootstrap` I explain in the article '[Testing with dependency injection][testing]' in this blog.
+If you want to use a more advanced design pattern to initialize your application, together with dependency retrieval, you can create an instance of the class `Bootstrap` I explain in the article '[Testing with dependency retrieval][testing]' in this blog.
 
 This is the part of your `Bootstrap` class that calls the function creating the channels:
 
@@ -319,6 +319,6 @@ If you've enjoyed this article, consider donating some bitcoin: bc1qncxh5xs6erq6
 [github]: https://github.com/syrop/
 [fcm]: https://firebase.google.com/docs/cloud-messaging/
 [workmanager]: https://developer.android.com/topic/libraries/architecture/workmanager/
-[testing]: https://syrop.github.io/jekyll/update/2018/12/25/testing-with-dependency-injection.html
+[testing]: https://syrop.github.io/jekyll/update/2018/12/25/testing-with-dependency-retrieval.html
 [architecture-components]: https://developer.android.com/topic/libraries/architecture/
 [donations]: https://syrop.github.io/donate/

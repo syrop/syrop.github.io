@@ -5,15 +5,15 @@ date:   2018-12-31 0:06:00 +0100
 categories: jekyll update
 ---
 
-This article will explain a simple way in which you can obtain an instance of `java.util.logging.Logger` through dependency injection.
+This article will explain a simple way in which you can obtain an instance of `java.util.logging.Logger` through dependency retrieval.
 
-For dependency injection I am going to use the library [Kodein][kodein-di]. If you need an introduction to Kodein, please see [this article][testing-article] in this blog.
+For dependency retrieval I am going to use the library [Kodein][kodein-di]. If you need an introduction to Kodein, please see [this article][testing-article] in this blog.
 
 The purpose of this article is to show you how to create a separate instance of `Logger` for every class, as well as how to automatically disable debug messages in production builds.
 
 ## Without Kodein
 
-To create a good enough effect without using Kodein, or dependency injection, just use the following line:
+To create a good enough effect without using Kodein, or dependency retrieval, just use the following line:
 
 {% highlight kotlin %}
 
@@ -23,7 +23,7 @@ val Any.log get() = Logger.getLogger(this::class.java.name)!!
 
 Because of the above global extension function, each time you use the expression `log` in your code, it will be interpreted as creation of an instance of `java.util.logging.Logger` with passing the name of the current class to its constructor.
 
-The following sections will explain how to create a similar effect with dependency injection, so that a custom instance of `Logger` can be retrieved depending on the way you run your application.
+The following sections will explain how to create a similar effect with dependency retrieval, so that a custom instance of `Logger` can be retrieved depending on the way you run your application.
 
 You can see a [separate article][testing-article] in this blog to find out how to configure Kodein specifically so that other kinds of instances are retrieved when the application is run with Android Espresso.
 
@@ -93,7 +93,7 @@ class MainActivity: AppCompatActivity() {
 
 Because it is a multiton, only one instance of `Logger` is created in the above code. Furthermode, because of the way Kodein is configured, if this is called from a production build, no debug messages will be produced.
 
-You can see logging and dependency injection being used this way in my project [Victor-Events][events].
+You can see logging and dependency retrieval being used this way in my project [Victor-Events][events].
 
 
 ## Donations
@@ -101,7 +101,7 @@ You can see logging and dependency injection being used this way in my project [
 If you've enjoyed this article, consider donating some bitcoin: bc1qncxh5xs6erq6w4qz3a7xl7f50agrgn3w58dsfp (you can also look at [donations page][donations]).
 
 [kodein-di]: https://kodein.org/di/
-[testing-article]: https://syrop.github.io/jekyll/update/2018/12/25/testing-with-dependency-injection.html
+[testing-article]: https://syrop.github.io/jekyll/update/2018/12/25/testing-with-dependency-retrieval.html
 [kodein-multiton]: http://kodein.org/Kodein-DI/?6.0/core#_multiton_binding
 [events]: https://github.com/syrop/Victor-Events
 [donations]: https://syrop.github.io/donate/
