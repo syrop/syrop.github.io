@@ -220,7 +220,7 @@ I hope to have correctly explained [MVP], [MVVM] and [MVC]. If the reader finds 
 [extending-article]: https://syrop.github.io/jekyll/update/2019/06/02/extending-livedata.html
 [livedata-function]: https://developer.android.com/topic/libraries/architecture/coroutines#livedata
 [wrapping-article]: https://syrop.github.io/jekyll/update/2019/06/04/wrapping-channel-in-livedata.html
-[testing-article]: https://syrop.github.io/jekyll/update/2019/06/20/viewmodel-mockito.html
+[testing-article]: https://syrop.github.io/jekyll/update/2019/06/21/viewmodel-mockito.html
 [talk]: https://www.youtube.com/watch?v=VsStyq4Lzxo
 [jetpack-compose]: https://developer.android.com/jetpack/compose/
 [flow]: https://youtu.be/VsStyq4Lzxo?t=1420
