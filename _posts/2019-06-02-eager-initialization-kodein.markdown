@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Eager initialization for Kodein"
-date:   2019-06-02 15:43 +0200
+date:   2019-06-02 15:43:00 +0200
 categories: jekyll update
 ---
 This article explains  to use [Kodein] eagerly. By default it works lazily. Until now I haven't been able to use it to retrieve a value eagerly, that is without using the keyword `val` or `var`.

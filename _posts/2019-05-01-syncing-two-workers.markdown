@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Syncing two ListenableWorkers (decorator pattern)"
-date:   2019-05-01 14:41 +0200
+date:   2019-05-01 14:41:00 +0200
 categories: jekyll update
 ---
 

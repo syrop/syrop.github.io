@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Extending LiveData (implementing a compass)"
-date:   2019-06-02 20:35 +0200
+date:   2019-06-02 20:35:00 +0200
 categories: jekyll update
 ---
 

@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Retrofit asynchronously"
-date:   2019-06-18 20:48 +0200
+date:   2019-06-18 20:48:00 +0200
 categories: jekyll update
 ---
 

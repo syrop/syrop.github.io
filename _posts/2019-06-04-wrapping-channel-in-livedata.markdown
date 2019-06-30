@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Wrapping Channel in LiveData (refactoring)"
-date:   2019-06-04 13:22 +0200
+date:   2019-06-04 13:22:00 +0200
 categories: jekyll update
 ---
 

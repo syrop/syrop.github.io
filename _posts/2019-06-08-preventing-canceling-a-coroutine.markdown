@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Preventing canceling a coroutine"
-date:   2019-06-08 11:45 +0200
+date:   2019-06-08 11:45:00 +0200
 categories: jekyll update
 ---
 
