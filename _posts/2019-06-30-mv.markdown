@@ -179,9 +179,9 @@ If the developer wants to test `CompassViewModel` with lifecycle, using the func
 
 The same is true when the developer wants to remove the observer by calling `removeObserver()` or `removeObservers()`. Implementing `CompassViewModel` with [`liveData()`][livedata-function] has been explained in a [separate article][wrapping-article] in this blog.
 
-To avoid having to deal with this timeout, the developer may manually set it to 0 seconds, or decline using [`liveData()`][livedata-function] altogether in the implementation of `CompassViewModel`.
+To avoid having to deal with this timeout, the developer may manually set it to 0 seconds, or decline using [`liveData()`][livedata-function] altogether in the implementation of `CompassViewModel`. They may do so by extending `LiveData` manually.
 
-When `LiveData` is extended manually by overriding the functions [`onActive()`][on-active] and [`onInactive()`][on-inactive], in the way I explained in [another article][extending-article] in this blog, the `Channel` is closed immediately, so the developer may write tests without taking timeout into consideration. Doing so is outside of the scope of the present article, though.
+When `LiveData` is extended manually by overriding the functions [`onActive()`][on-active] and [`onInactive()`][on-inactive], the way I explained in [another article][extending-article] in this blog, the `Channel` is closed immediately, so the developer may write tests without taking timeout into consideration. Doing so is outside of the scope of the present article, though.
 
 # MVC
 
