@@ -181,7 +181,7 @@ The same is true when the developer wants to remove the observer by calling `rem
 
 To avoid having to deal with this timeout, the developer may manually set it to 0 seconds, or decline using [`liveData()`][livedata-function] altogether in the implementation of `CompassViewModel`.
 
-When `LiveData` is extended manually by overriding the functions [`onActive()`][on-active] and [`onInactive()`][on-inactive], in the way I explained in [another article][extending-article] in this blog, the `Channel` is closed immediately, so the developer may write tests without taking timeout into considerations. Doing so is outside of the scope of the present article.
+When `LiveData` is extended manually by overriding the functions [`onActive()`][on-active] and [`onInactive()`][on-inactive], in the way I explained in [another article][extending-article] in this blog, the `Channel` is closed immediately, so the developer may write tests without taking timeout into consideration. Doing so is outside of the scope of the present article, though.
 
 # MVC
 
