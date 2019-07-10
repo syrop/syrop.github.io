@@ -1,0 +1,132 @@
+---
+layout: post
+title:  "Repository testing (article previev)"
+date:   2019-07-10 19:54:00 +0200
+categories: jekyll update
+---
+
+This article shows how to test a repository in a relatively large project.
+
+## The project
+
+The project used in this article is Victor Events [link pending]
+
+## Lessons learned
+
+# Don't use circular dependencies
+
+In the project I used two repositories that depended on each other, `Comms` and `Events`. Each had the other passed in the constructor, which lead to the program hanging up.
+
+I solved it by using lazy initialization and passing one of the dependencies in a parameter of a function that would be only invoked later:
+
+```kotlin
+class EventSyncWorker(context: Context, params: WorkerParameters) :
+        CoroutineWorker(context, params), SyncWorker {
+
+    private val events by instance<Events>()
+    private val comms by instance<Comms>()
+
+    override suspend fun doWork() = syncCoroutineScope {
+        try {
+            events fromComms comms
+        }
+        catch (e: FirebaseFirestoreException) {}
+        Result.success()
+    }
+...
+}
+```
+
+Kodein solves the problem of circular dependencies by using lazy initialization by default, in case of dependencies retrieved into fields. (Lazy dependency retrieval is shown in the above code).
+
+However, because I decided to test my repositories, I decided to move the retrieval into another class. (`EventSyncWorker` is not being tested in the present version).
+
+The discussed change is visible in my [commit].
+
+# When using Room, use abstract classes instead of intefraces
+
+Here is the code I use for my `@Dao`:
+
+```kotlin
+@Dao
+abstract class EventsDao {
+
+    open suspend infix fun add(event: Event) = insert(Event.Entity(event))
+    suspend infix fun addAll(events: Collection<Event>) = insertAll(events.map { Event.Entity(it) })
+    suspend infix fun delete(event: Event) = delete(Event.Entity(event))
+    suspend inline fun getAllValues() = getAll().map { it.value() }
+
+    @Query("select * from ${EventsDb.EVENT_TABLE}")
+    abstract suspend fun getAll(): List<Event.Entity>
+
+    @Insert
+    abstract suspend fun insertAll(events: Collection<Event.Entity>)
+
+    @Insert
+    abstract suspend fun insert(event: Event.Entity)
+
+    @Delete
+    abstract suspend fun delete(event: Event.Entity)
+
+    @Query("delete from ${EventsDb.EVENT_TABLE}")
+    abstract suspend fun clear()
+}
+
+```
+
+Because I use `abstract class` istead of `interface` I can add my own functions. (Notice the `open` function used by Mockito). Previously I was using an `interface` with a few added extension functions, but these do not work well with Mockito.
+
+The change may be seen in the [commit].
+
+## The test
+
+This is the test. It may be further described in a final version of the article.
+
+Please note the annotation *article preview* in the title of the present version. When it is removed, the reader may expect a more detailed explanation.
+
+```kotlin
+@ExperimentalCoroutinesApi
+@ObsoleteCoroutinesApi
+class EventsTest {
+
+    private lateinit var fsReader: FsReader
+    private lateinit var fsWriter: FsWriter
+    private lateinit var eventsDao: EventsDao
+
+    private val mainThreadSurrogate = newSingleThreadContext("UI thread")
+
+    @get:Rule
+    val instantTaskExecutorRule = InstantTaskExecutorRule()
+
+    @Before
+    fun setUp() {
+        Dispatchers.setMain(mainThreadSurrogate)
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain() // reset main dispatcher to the original Main dispatcher
+        mainThreadSurrogate.close()
+    }
+
+    @Before
+    fun mockConstructorParameters() {
+        fsReader = mock(FsReader::class.java)
+        fsWriter = mock(FsWriter::class.java)
+        eventsDao = mock(EventsDao::class.java)
+    }
+
+    @Test
+    fun testAdd() = runBlockingTest {
+        val events = Events(fsReader, fsWriter, eventsDao)
+        val event = Event.creationEvent
+        events.add(event)
+        verify(fsWriter).add(event)
+        verify(eventsDao).add(event)
+    }
+}
+```
+
+
+[commit]: https://github.com/syrop/Victor-Events/commit/740f99922ca5a6c81e366a84c8c04ff30e8f6d82
+
