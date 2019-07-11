@@ -1,7 +1,7 @@
 ---
 layout: post
-title:  "Repository testing (article previev)"
-date:   2019-07-10 19:54:00 +0200
+title:  "Repository pattern and testing (previev)"
+date:   2019-07-10 21:5:00 +0200
 categories: jekyll update
 ---
 
@@ -9,7 +9,7 @@ This article shows how to test a repository in a relatively large project.
 
 ## The project
 
-The project used in this article is Victor Events [link pending]
+The project used in this article is [Victor Events][events].
 
 ## Lessons learned
 
@@ -41,9 +41,9 @@ Kodein solves the problem of circular dependencies by using lazy initialization 
 
 However, because I decided to test my repositories, I decided to move the retrieval into another class. (`EventSyncWorker` is not being tested in the present version).
 
-The discussed change is visible in my [commit].
+The discussed change is visible in my [commit-one].
 
-# When using Room, use abstract classes instead of intefraces
+# @Dao as an abstract class
 
 Here is the code I use for my `@Dao`:
 
@@ -76,13 +76,13 @@ abstract class EventsDao {
 
 Because I use `abstract class` istead of `interface` I can add my own functions. (Notice the `open` function used by Mockito). Previously I was using an `interface` with a few added extension functions, but these do not work well with Mockito.
 
-The change may be seen in the [commit].
+The change may be seen in the [commit-one].
 
 ## The test
 
 This is the test. It may be further described in a final version of the article.
 
-Please note the annotation *article preview* in the title of the present version. When it is removed, the reader may expect a more detailed explanation.
+Please note the annotation *preview* in the title of the present version. When it is removed, the reader may expect a more detailed explanation.
 
 ```kotlin
 @ExperimentalCoroutinesApi
@@ -105,7 +105,7 @@ class EventsTest {
 
     @After
     fun tearDown() {
-        Dispatchers.resetMain() // reset main dispatcher to the original Main dispatcher
+        Dispatchers.resetMain()
         mainThreadSurrogate.close()
     }
 
@@ -120,13 +120,17 @@ class EventsTest {
     fun testAdd() = runBlockingTest {
         val events = Events(fsReader, fsWriter, eventsDao)
         val event = Event.creationEvent
+        @Suppress("UNCHECKED_CAST")
+        val observer = mock(Observer::class.java) as Observer<Unit>
+        events.updatedLiveData().observeForever(observer)
         events.add(event)
         verify(fsWriter).add(event)
         verify(eventsDao).add(event)
+        verify(observer).onChanged(Unit)
     }
 }
 ```
 
-
-[commit]: https://github.com/syrop/Victor-Events/commit/740f99922ca5a6c81e366a84c8c04ff30e8f6d82
+[events]: https://github.com/syrop/Victor-Events
+[commit-one]: https://github.com/syrop/Victor-Events/commit/740f99922ca5a6c81e366a84c8c04ff30e8f6d82
 
