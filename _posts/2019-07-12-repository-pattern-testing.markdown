@@ -94,6 +94,87 @@ I decided to stick to using an abstract class, even though the [documentation][d
 
 The change may be seen in the [commit][commit-one].
 
+## Listening to changes
+
+In [another article][liverepository] in this blog, in the section 'Observable repository', I described a design pattern I use for different observers to be notifien when there has been a change in the repository. I call that pattern `LiveRepository`.
+
+This is the code I was using before I performed a refactoring, which I will discuss shortly. **Please do not use it**:
+
+```kotlin
+abstract class LiveRepository {
+
+    private val liveData = MutableLiveData<Unit>()
+
+    private val channel = BroadcastChannel<Unit>(Channel.CONFLATED)
+
+    protected fun notifyDataSetChanged() {
+        liveData.postValue(Unit)
+        channel.sendBlocking(Unit)
+    }
+
+    infix fun vm(vm: ViewModel) = { block: () -> Unit ->
+        vm.viewModelScope.launch { this@LiveRepository(block) }
+    }
+
+    operator fun plus(owner: LifecycleOwner): HotData<Unit> =
+            DefaultHotData(liveData, owner)
+
+    suspend operator fun invoke(block: () -> Unit) {
+        with (channel.openSubscription()) {
+            if (!isEmpty) receive()
+            try {
+                while (true) {
+                    receive()
+                    block()
+                }
+            } finally { cancel() }
+        }
+    }
+}
+```
+
+The code above tries to solve the following problem:
+
+There are two ways in which something may be observed. One is aware of `Lifecycle`, and the other is aware of `CoroutineScope`.
+
+Things observed in `Activity` and `Fragment` should probably use `LiveData`, but beceause `Lifecycle` is not present in `ViewModel`, but `viewModelScope` is, the developer, apart from returning an instance of `LiveData`, should provide a mechanism that is canceled simultaneously with the surrounding `CoroutineScope`.
+
+
+In the above code, I accomodated for the first case by implementing the operator `plus()` that combines `LiveData` with `LifeCycle`, so that it may be observed by an outside code. The latter case is addressed by the suspend operator `invoke()`, which runs a block of code on each update, as long as the `CoroutineScope` it runs in is not canceled.
+
+The DSL I used in the above code is discussed in a [dedicated article][dsl-article] in this blog. Please note that at present, I **do not recommend** using it.
+
+Instead of the above, I currently suggest the form presented below, and introduced in a specific [commit][commit-two]:
+
+```kotlin
+abstract class LiveRepository {
+
+    private val broadcastChannel = BroadcastChannel<Unit>(Channel.CONFLATED)
+
+    protected fun notifyDataSetChanged() {
+        broadcastChannel.sendBlocking(Unit)
+    }
+
+    fun updatedLiveData(scope: CoroutineScope) =
+        updatedLiveData(scope.coroutineContext)
+
+    fun updatedLiveData(context: CoroutineContext = EmptyCoroutineContext) =
+            liveData(context) {
+                with (broadcastChannel.openSubscription()) {
+                    try {
+                        while (true) {
+                            emit(receive())
+                        }
+                    }
+                    finally {
+                        cancel()
+                    }
+                }
+            }
+        }
+
+```
+
 ## The test
 
 This is the test. It may be further described in a final version of the article.
@@ -151,4 +232,6 @@ class EventsTest {
 [commit-one]: https://github.com/syrop/Victor-Events/commit/740f99922ca5a6c81e366a84c8c04ff30e8f6d82
 [dao-doco]: https://developer.android.com/training/data-storage/room/accessing-data.html
 [lazy]: https://kotlinlang.org/api/latest/jvm/stdlib/kotlin/-lazy/index.html
-
+[liverepository-article]: https://syrop.github.io/jekyll/update/2019/04/27/refreshing-your-data.html
+[dsl-article]: https://syrop.github.io/jekyll/update/2019/04/30/repository-and-DSL.html
+[commit-two]: https://github.com/syrop/Victor-Events/commit/898a34fffa80131dc6819bb2bd84061c65dc8b07
