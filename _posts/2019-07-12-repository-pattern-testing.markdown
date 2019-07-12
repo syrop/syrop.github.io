@@ -175,6 +175,16 @@ abstract class LiveRepository {
 
 ```
 
+The above code takes advantage of my favorite function [`liveData()`][livedata], which wraps `CoroutineScope` handling in `LiveData`.
+
+The function currently is in its alpha state, but I believe it is good to use it. By doing so, the developer takes advantage of code that is probably already tested by thousands of other developers.
+
+By avoiding the use of alpha dependencies, and choosing to use one's own implementations, the developer is forced to use a code that is only tested by themselves, and perhaps a few of the other members of their team, and has to maintain it.
+
+By using the libraries provided by Google, even though they are in alpha stage now, the developer capitalizes of the maintenance performed by the company, and the function itself will probably soon reach a stable release.
+
+The required dependencies for [`liveData()`][livedata] are listed in Google's [documentation][livedata-dependencies].
+
 ## The test
 
 This is the test. It may be further described in a final version of the article.
@@ -235,3 +245,5 @@ class EventsTest {
 [liverepository-article]: https://syrop.github.io/jekyll/update/2019/04/27/refreshing-your-data.html
 [dsl-article]: https://syrop.github.io/jekyll/update/2019/04/30/repository-and-DSL.html
 [commit-two]: https://github.com/syrop/Victor-Events/commit/898a34fffa80131dc6819bb2bd84061c65dc8b07
+[livedata]: https://developer.android.com/reference/kotlin/androidx/lifecycle/package-summary#liveData(kotlin.coroutines.CoroutineContext,%20kotlin.Long,%20kotlin.coroutines.SuspendFunction1)
+[livedata-dependencies]: https://developer.android.com/topic/libraries/architecture/coroutines
