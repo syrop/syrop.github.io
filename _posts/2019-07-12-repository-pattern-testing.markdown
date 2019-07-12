@@ -1,15 +1,11 @@
 ---
 layout: post
-title:  "Repository pattern and testing (previev)"
+title:  "Repository pattern and testing"
 date:   2019-07-12 05:01:00 +0200
 categories: jekyll update
 ---
 
-This article shows how to test a repository in a relatively large project.
-
-## The project
-
-The project used in this article is [Victor Events][events].
+This article shows how to test a repository in a relatively large [project][events].
 
 ## Lessons learned
 
@@ -185,11 +181,66 @@ By using the libraries provided by Google, even though they are in alpha stage n
 
 The required dependencies for [`liveData()`][livedata] are listed in Google's [documentation][livedata-dependencies].
 
+The only time when I use `upDateLiveData()` with `CoroutineContext` other than the defauld `EmptyCoroutineContext` is when I don't consume the `LiveData` in `Activity` or `Fragment`, but inside `ViemModel`:
+
+```kotlin
+class CommViewModel(private val state: SavedStateHandle) : ViewModel() {
+
+    ...
+
+    val name by lazy { MutableLiveData<String?>() }
+    val desc by lazy { MutableLiveData<String?>() }
+    val isAdmin by lazy { MutableLiveData<Boolean?>() }
+
+    init {
+        comms.updatedLiveData(viewModelScope).observeForever { update() }
+        val position = state.get<Int>(COMM_POSITION) ?: -1
+        if (position >= 0) {
+            comm = comms[position]
+        }
+    }
+
+    fun withPosition(position: Int) {
+        comm = comms[position]
+        state.set(COMM_POSITION, position)
+    }
+
+    fun update() {
+        comm = comms[comm.name]
+        reset()
+    }
+
+    fun reset() {
+        name.value = comm.name
+        desc.value = comm.desc
+        isAdmin.value = comm.isAdmin
+    }
+
+    ...
+}
+
+```
+
+In the above code, belonging to a `ViewModel`, I don't expose directly the `LiveData` coming from the `LiveRepository`. Instead, I create a few other instances of LiveData and expose *them*.
+
+The fields `name`, `desc` and `isAdmin` are instances of `LiveData` that are exposed to the `Fragment` that uses them. Because I didn't want the `Fragment` itself be notified about the updates is the repository, I have no access to `Lifecycle`.
+
+What I do have access to is `viewModelScope`, so I use it to create `LiveData` and observe it *forever* in the line:
+
+```kotlin
+comms.updatedLiveData(viewModelScope).observeForever { update() }
+```
+
+Thanks to that, the `CoroutineScope` wrapped in the `LiveData` will be canceled in due time, which prevents the `ViewModel` from hanging around and being notified when it is no longer alive.
+
+
 ## The test
 
-This is the test. It may be further described in a final version of the article.
+Testing with coroutines was discussing in another [article][testing-article] in this blog, so I recommend reading it to it in order to understand the present description.
 
-Please note the annotation *preview* in the title of the present version. When it is removed, the reader may expect a more detailed explanation.
+Preparation for tests, like the use of a few of the annotations `@Rule`, `@Before` and `@After`, was explained in the other [article][testing-article], so I won't repeat it here.
+
+This is the testing code:
 
 ```kotlin
 @ExperimentalCoroutinesApi
@@ -238,6 +289,34 @@ class EventsTest {
 }
 ```
 
+When I add more tests to the code of the class pasted above, probably all of them are going to inject the same dependencies (`FsReader`, `FsWriter` and `EventDao`) in the constructor of `Events`, so I moved thein initialization to one of the `@Before` functions.
+
+In case specific arrangements need to be done for a particular test, they will be in specific functions annotated as `@Test`, but the creation of the mock itself will probably be common for all tests.
+
+The test verifies that three things happen od addition of an `Event` to the repository:
+
+1. The `Event` is added to Firestore database.
+2. The `Event` is added to the DAO.
+3. An interested 'Observer' is notified about the change.
+
+As dicsussed above, the test mocks the Firebase cloud and the DAO. Because I am not sure whether the `Observer` is going to be used in other tests, and it is not a required dependency, I decided to mock it in the `@Test` function. Because I do not have a `Lifecycle` available in the test, I start the observation by calling `observeForever()`, which doesn't require it.
+
+## Conclusion
+
+The present article has demonstrated how to add to a project a test using dependency injection and coroutines.
+
+It has also demonstrated how to use one function currently in alpha stage - [`liveData()`][livedata] - to create an instance of `LiveData` that is aware not only of `Lifecycle`, but also of `CoroutineScope`.
+
+It has also shown the progress I made in my understanding of testing with Mockito, since I wrote the first [article][testing-article] about it.
+
+I have used Mockito in two of my projects now: The [first article][testing-article] used the project [Compass] as an example, while the present one is using a more advanced project - [Victor Events][events] - which I still have a great interest in developing, and is probably going to have many more improvements, which may be in time described in this blog.
+
+## Donations
+
+If the reader has enjoyed the article, they may want to donate some bitcoin at the address presented below. Readers may also look at my [donations page][donate].
+
+BTC: bc1qncxh5xs6erq6w4qz3a7xl7f50agrgn3w58dsfp
+
 [events]: https://github.com/syrop/Victor-Events
 [commit-one]: https://github.com/syrop/Victor-Events/commit/740f99922ca5a6c81e366a84c8c04ff30e8f6d82
 [dao-doco]: https://developer.android.com/training/data-storage/room/accessing-data.html
@@ -247,3 +326,7 @@ class EventsTest {
 [commit-two]: https://github.com/syrop/Victor-Events/commit/898a34fffa80131dc6819bb2bd84061c65dc8b07
 [livedata]: https://developer.android.com/reference/kotlin/androidx/lifecycle/package-summary#liveData(kotlin.coroutines.CoroutineContext,%20kotlin.Long,%20kotlin.coroutines.SuspendFunction1)
 [livedata-dependencies]: https://developer.android.com/topic/libraries/architecture/coroutines
+[testing-article]: https://syrop.github.io/jekyll/update/2019/06/21/viewmodel-mockito.html
+[compass]: https://github.com/syrop/Compass
+[donate]: https://syrop.github.io/donate/
+

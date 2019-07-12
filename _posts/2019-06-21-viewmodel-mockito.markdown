@@ -13,7 +13,7 @@ Add Mockito tests to the [project][compass] using depencency injection (refactor
 
 ## Credits
 
-I learned how to set up the testing rules so that the code can rely on the main thread from an [answer][stackoverflow1] on StackOverflow. I learned how to use the `@Ruled` annotation in Kotlin from [another answer][stackoverflow2].
+I learned how to set up the testing rules so that the code can rely on the main thread from an [answer][stackoverflow1] on StackOverflow. I learned how to use the `@Rule` annotation in Kotlin from [another answer][stackoverflow2].
 
 ## Preparing the project
 
