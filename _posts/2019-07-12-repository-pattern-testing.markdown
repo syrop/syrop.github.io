@@ -274,17 +274,18 @@ class EventsTest {
         eventsDao = mock(EventsDao::class.java)
     }
 
-    @Test
     fun testAdd() = runBlockingTest {
         val events = Events(fsReader, fsWriter, eventsDao)
         val event = Event.creationEvent
+        val job = Job()
         @Suppress("UNCHECKED_CAST")
         val observer = mock(Observer::class.java) as Observer<Unit>
-        events.updatedLiveData().observeForever(observer)
+        events.updatedLiveData(job).observeForever(observer)
         events.add(event)
         verify(fsWriter).add(event)
         verify(eventsDao).add(event)
         verify(observer).onChanged(Unit)
+        job.cancel()
     }
 }
 ```
