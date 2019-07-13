@@ -11,7 +11,7 @@ This article shows how to test a repository in a relatively large [project][even
 
 # Don't use circular dependencies
 
-In the project I use two repositories - `Comms` and `Events` - that used to depend on each other. Each repository had the other one passed in the constructor, which lead to the app hanging up.
+In the project I use two repositories, `Comms` and `Events`, that used to depend on each other. Each repository had the other one passed in the constructor, which lead to the app hanging up.
 
 I solved it by using lazy initialization and passing one of the dependencies in a parameter of a function that would be only invoked later:
 
