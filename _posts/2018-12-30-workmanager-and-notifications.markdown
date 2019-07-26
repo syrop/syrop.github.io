@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "WorkManager and notifications"
+title:  "WorkManager and push notifications"
 date:   2018-12-30 21:12:00 +0100
 categories: jekyll update
 ---
