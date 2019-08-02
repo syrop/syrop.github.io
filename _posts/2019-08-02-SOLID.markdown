@@ -39,7 +39,7 @@ I do not understand who is coming up with these names! Please, if you do underst
 
 I understand the value Dagger creates. I use Kodein instead, but I recognize Dagger as a piece of valuable software, although not my first preference.
 
-I do not understand at all, however, the [coffee machine example][coffee-machine]. I am able to follow the consecutive steps, but has one actually implemented a coffee maker with dagger? If this is not the case, this example is invalid, even if the points it is trying to convey are invalid.
+I do not understand at all, however, the [coffee machine example][coffee-machine]. I am able to follow the consecutive steps, but has anyone actually implemented a coffee maker with Dagger? If this is not the case, this example is invalid, even if the points it is trying to convey are invalid.
 
 I am watching the [presentation][dagger] about Dagger given by Jake Wharton. Jake in it pretends to write an implementation of a Tweeter client.
 
