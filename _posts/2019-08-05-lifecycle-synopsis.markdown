@@ -18,7 +18,11 @@ I am not sure what does listing these six bulletpoints matter:
 * onStop()
 * onDestroy()
 
-I've been trying to ask interviewers about the meaning of `onStart()` and `onStop()`, as I've never seen them used in a project, but the answers I receive from them usually only address what happens in Android during each particular stage, and not what problems I can solve by overriding each particular function, and whether I should override all of them.
+I've been trying to ask interviewers about the meaning of `onStart()` vs `onResume()` and `onStop()` vs `onPause()`, as I've never seen all of them being used simultaneously in a project.
+
+Specifically, I wanted to find out what code to put in each of them.
+
+However, the answers I received from the interviewers usually only addressed what happens in Android during each particular stage, and not what problems I can solve by overriding each particular function, and whether I should override all of them.
 
 In the present article I am trying to answer how to use lifecycle to solve different categories of problems. Answering whether the developer should put any code in `onStop()` is beyond its scope, though.
 
@@ -56,9 +60,9 @@ class RxLiveData<T>(private val observable: Observable<T>) : LiveData<T>() {
 
 The above code is written using RxJava 2.
 
-Depending what happens in `Obsevrable`'s 'doOnSubscribe()' and 'doOnDispose()' it may be wise to refrain from using the above `onActive()` and `onInactive()` as these are called each time the app is paused.
+Depending what happens in `Obsevrable`'s `doOnSubscribe()` and `doOnDispose()`, it may be wise to refrain from using the above `onActive()` and `onInactive()` as these are called each time the app is paused. More accurately speaking, `onActive()` happens in `onStart()`, and `onInactive()` happens in `onStop()`.
 
-More accurately speaking, `onActive()` happens right before `onStart()`, and `onInactive()` happens between `onPause()` and `onStop()`. I haven't thoroughly investigated which lifecycle event triggers these `LiveData` functions, but if the developer wants to have a greater control over the `Observable`, they may want to override lifecycle functions manually.
+If the developer wants to have a greater control over the `Observable`, they may want to override lifecycle functions manually, and instead of `onStart()` and `onStop()` use `onCreate()` and `onDestroy()`.
 
 Because I do not use RxJava very often, I am not sure whether the above code should use `lateinit var disposable: Disposable` or rather `var disposable: Disposable? = null`. If the reader thinks they know a more suitable version of the code, please [contact me][ticket], and I will consider changing the article, with due credit to the author of the ticket.
 
