@@ -18,13 +18,11 @@ I am not sure what does listing these six bulletpoints matter:
 * onStop()
 * onDestroy()
 
-I've been trying to ask interviewers about the meaning of `onStart()` vs `onResume()` and `onStop()` vs `onPause()`, as I've never seen all of them being used simultaneously in a project.
+I've been trying to ask interviewers about the meaning of `onStart()` vs `onResume()` and `onStop()` vs `onPause()`, as I've never seen all of them being used simultaneously in a project. Specifically, I wanted to find out what code to put in each of them.
 
-Specifically, I wanted to find out what code to put in each of them.
+The answers I received from the interviewers, however, usually only addressed what happens in Android during each particular stage - not what problems I can solve by overriding each particular function and whether I should override all of them.
 
-However, the answers I received from the interviewers usually only addressed what happens in Android during each particular stage, and not what problems I can solve by overriding each particular function, and whether I should override all of them.
-
-In the present article I am trying to answer how to use lifecycle to solve different categories of problems. Answering whether the developer should put any code in `onStop()` is beyond its scope, though.
+In the present article I am trying to answer how to use lifecycle to solve different categories of problems.
 
 ## Reflecting the state in the UI
 
