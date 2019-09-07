@@ -1,0 +1,203 @@
+---
+layout: post
+title:  "State inside ViewModel"
+date:   2019-09-07 18:36:00 +0200
+categories: jekyll update
+---
+
+The article describes handling state inside a ViewModel.
+
+Other articles on the subject of performing work insine a `ViewModel` have been already published in this blog. This time I am addressing specifically handling the state, such as *Idle*, *Pending*, *In Progress*, *Error*, *Success*, where the number of available states depends on the tasks.
+
+## The problem
+
+Write a demonstation of asynchronous execution of two different tasks - downloading data from the internet (more complex) and loading it from a local database (less complex).
+
+## The project
+
+The project is [Weather]. In the project the user selects location on a map, or types in a city name. As soon as the location is thus selected, the program displays the weather using the service <https://openweathermap.org/api>.
+
+The project is actually a solution of a recruitment task I had in a particular company. That particular company - rather than looking at my blog or my other projects - demanded that I do from scratch a free program for them, and then even failed to meet me on time at the scheduled job interview.
+
+Demanding from the candidates performing some unpaid labour for the sake of the recruitment process is unethical - if the candidate already owns a pre-made portfolio accompanied by a body of documentation. The only payment I received for this was an opportunity to write an article on an interesting topic of asynchronous work.
+
+The reader may read a [full description in Polish][polish] of the task at hand.
+
+This is the first time [the project][weather] is mentioned in this blog.
+
+## Other materials
+
+The problem I am discussing in this blog has already beed mentioned in [another blog][blog]:
+
+> You don’t usually extend LiveData. Let your activity or fragment tell the ViewModel when it’s time to start loading data.
+
+The [blog article][blog] also points to an [example source file][source] demonstrating where one may put a function launching the loading process.
+
+In the present article I demonstrate launching data loading by a dedicated function (the more complex task), as well as doing it in the `ViewModel`'s constructor for a task that is expected to execute quickly and without problem.
+
+I do understantd the merits of extending `LiveData`, and I [did it once][extending], although then I [quickly refactored it][refactoring] to use the [`liveData()`][livedata] function.
+
+## The default state - Idle
+
+By default the state of my `ViewModel` is `State.Idle`. It's defined in the `WeatherModel`:
+
+```kotlin
+private var currentState: State = State.Idle
+private val mutableLiveState = MutableLiveData(currentState)
+```
+
+It can be reset when the last presented weather report is no longer required by the GUI:
+
+```kotlin
+fun reset() {
+    searchJob?.cancel()
+    currentState = State.Idle
+    mutableLiveState.value = currentState
+}
+```
+
+The above `reset()` function is called when the user leaves the `Fragment` presenting the weather report:
+
+```kotlin
+requireActivity().onBackPressedDispatcher.addCallback(this) {
+        viewModel.reset()
+        back()
+    }
+```
+
+The *Idle* state is specifically required when setting the weather report read form the local database. Because reading from the local database (as opposed to from the internet) doesn't require handling failures, the weather result is set to *Success* directly from *idle*. The following function is never allowed to be called in another situation. For example, this function will throw in it is called while the data is already being dowloaded:
+
+```kotlin
+fun setWeather(weather: WeatherJson) {
+    check(currentState == State.Idle) { "Only set fixed weather from Idle state" }
+    currentState = State.Success(weather)
+    mutableLiveState.value = currentState
+}
+```
+
+## Setting location
+
+One of the following two functions are called when the user selects from the GUI ethrer the latitude and longitude of the desired location, or the city name:
+
+fun pendingSearch(location: LatLng) {
+    currentState = State.Pending(
+            WeatherService.Query.Location(LatLng(location.latitude, location.longitude)))
+    mutableLiveState.value = currentState
+}
+
+fun pendingSearch(city: String) {
+    currentState = State.Pending(WeatherService.Query.City(city))
+    mutableLiveState.value = currentState
+}
+
+## Launching the search
+
+This is the code that launches the search inside the `ViewModel` right before navigating to another `Fragment`. The desired location should be already set using one of the two functions described in the previous section:
+
+```kotlin
+fun launchSearch() {
+    viewModel.launchSearch()
+    nav(R.id.action_form_to_presentation)
+}
+```
+
+The above code is placed in the `Fragment`.
+
+The code below is inside of the the `ViewModel` that (**1**) checks the current state, (**2**) sets the new state, (**3**) launches an asynchronous search:
+
+```kotlin
+fun launchSearch() {
+    currentState.let { state ->
+        check(state is State.Pending) { "Only launch search from Pending state" }
+        currentState = State.InProgress
+        mutableLiveState.value = currentState
+        searchJob = viewModelScope.launch {
+            val response = when (val query = state.query) {
+                is WeatherService.Query.City -> weatherService.getCity(query.city)
+                is WeatherService.Query.Location ->
+                    weatherService.getLocation(query.location.latitude, query.location.longitude)
+            }
+            log.info(response.raw().toString())
+            currentState = if (response.isSuccessful) {
+                val weather = checkNotNull(response.body())
+                withContext(NonCancellable) {
+                    weatherDao.add(weather)
+                }
+                State.Success(weather)
+            }
+            else State.Error
+            mutableLiveState.value = currentState
+        }
+    }
+}
+```
+
+Please note that `viewModelScope`, [since version 2.2.0-alpha04][alpha], by default uses `Dispatchers.Main.immediate`, so there is no need to explicitly tell it it should run on main thread (it already knows that). Retrofit by default uses `Dispatchers.IO`, so I never actually have to switch `CoroutineContext` to manually set the `CoroutineDispatcher` properly. I only write `withContext(NonCancellable)` when I want to prevent a portion of the code from being canceled. I discussed preventing coroutine from canceling in [another article][noncancellable] in this blog.
+
+## Handling the state
+
+This is the code inside the `Fragment` that handles the state:
+
+```kotlin
+(viewModel.liveState to this) { state ->
+    when (state) {
+        is WeatherViewModel.State.InProgress -> inProgress()
+        is WeatherViewModel.State.Success -> details(state.weather)
+        is WeatherViewModel.State.Error -> error()
+    }
+}
+```
+
+Only states that affect the GUI must be handled in this `when` statement. Examples of handling other states have already been discussed in the previous sections.
+
+## Starting simple work from inside the ViewModel
+
+In the above sections I discussed a rather sophisticated process of setting and reacting to state held by a `ViewModel`.
+
+In the present section I will describe a more simple way of launching work from the `ViewModel`'s constructor. I only do so before I am sure of this condition: It is okay for the `ViewModel` to be in the *In Progress* state immediately after creation. This is the case because the data required by the `ViewModel` to perform its task is already available even before the `ViewModel` is created.
+
+This is the entire `ViewModel` required to read data usinng Room. Notice how much more simple it is than the `ViewModel` discussed over the course of a handful of the preceeding sections:
+
+```kotlin
+class ArchiveViewModel : ViewModel() {
+
+    private val mutableState = MutableLiveData<State>(State.InProgress)
+    val liveState get() = mutableState as LiveData<State>
+    private val weatherDao by instance<WeatherDao>()
+
+    init {
+        viewModelScope.launch {
+            mutableState.value = State.Success(weatherDao.getAllEntities())
+        }
+    }
+
+    sealed class State {
+        object InProgress : State()
+        data class Success(val list: List<WeatherEntity>) : State()
+    }
+}
+```
+
+## Conclusion
+
+This article is an example of doco of [a small project][weather] I did the other day as a part of an unsuccessful recruitment process.
+
+I demonstrate herein how to find a couple of the most important features of a small project and document them. Without the present article - which I expect to substantiate the project's value - I wouldn't be even inclined to keep the project on github.
+
+This discussion explained some of the possible ways of handling state in two different instances - a relatively sophisticated process of passing data between a few `Fragment`s, and a rather simple logic of loading data from local database in a `ViewModel` that is kept only within the scope of a single `Fragment`.
+
+If the reader has enjoyed the present documentation, and has some bitcoin lying aroung, they are welcome to look at my [donations page][donate].
+
+If any of the readers has suggestions regarding handling state in Android projects in Kotlin relying heavily on `ViewModel`, I kindly ask them to [submit a ticket][ticket] to this blog. Thank you!
+
+[weather]: https://github.com/syrop/Weather
+[polish]: https://github.com/syrop/Weather/blob/master/README.md
+[blog]: https://medium.com/androiddevelopers/viewmodels-and-livedata-patterns-antipatterns-21efaef74a54
+[source]: https://github.com/googlesamples/android-architecture/blob/dev-todo-mvvm-live/todoapp/app/src/main/java/com/example/android/architecture/blueprints/todoapp/addedittask/AddEditTaskFragment.java#L64
+[extending]: https://syrop.github.io/jekyll/update/2019/06/02/extending-livedata.html
+[refactoring]: https://syrop.github.io/jekyll/update/2019/06/04/wrapping-channel-in-livedata.html
+[livedata]: https://developer.android.com/topic/libraries/architecture/coroutines#livedata
+[alpha]: https://developer.android.com/jetpack/androidx/releases/lifecycle#2.2.0-alpha04
+[noncancellable]: https://syrop.github.io/jekyll/update/2019/06/08/preventing-canceling-a-coroutine.html
+[donate]: https://syrop.github.io/donate/
+[ticket]: https://github.com/syrop/syrop.github.io/issues
