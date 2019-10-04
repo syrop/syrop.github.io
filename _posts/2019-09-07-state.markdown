@@ -17,10 +17,6 @@ Write a demonstation of asynchronous execution of two different tasks - download
 
 The project is [Weather]. In the project the user selects location on a map, or types in a city name. As soon as the location is thus selected, the program displays the weather using the service <https://openweathermap.org/api>.
 
-The project is actually a solution of a recruitment task I had in a particular company. That particular company - rather than looking at my blog or my other projects - demanded that I do from scratch a free program for them, and then even failed to meet me on time at the scheduled job interview.
-
-Demanding from the candidates performing some unpaid labour for the sake of the recruitment process is unethical - if the candidate already owns a pre-made portfolio accompanied by a body of documentation. The only payment I received for this was an opportunity to write an article on an interesting topic of asynchronous work.
-
 The reader may read a [full description in Polish][polish] of the task at hand.
 
 This is the first time [the project][weather] is mentioned in this blog.
