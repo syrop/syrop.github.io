@@ -17,9 +17,7 @@ Write a demonstation of asynchronous execution of two different tasks - download
 
 The project is [Weather]. In the project the user selects location on a map, or types in a city name. As soon as the location is thus selected, the program displays the weather using the service <https://openweathermap.org/api>.
 
-The reader may read a [full description in Polish][polish] of the task at hand.
-
-This is the first time [the project][weather] is mentioned in this blog.
+The reader may read a [full description in Polish][polish] of the task.
 
 ## Other materials
 
