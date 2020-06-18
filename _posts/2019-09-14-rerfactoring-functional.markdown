@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Refactoring code to functional style"
+title:  "Refactoring the code to functional style"
 date:   2019-09-14 20:14:00 +0200
 categories: jekyll update
 ---
