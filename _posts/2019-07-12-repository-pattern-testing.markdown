@@ -92,7 +92,7 @@ The change may be seen in the [commit][commit-one].
 
 ## Listening to changes
 
-In [another article][liverepository-article] in this blog, in the section 'Observable repository', I described a design pattern I use for different observers to be notifien when there has been a change in the repository. I call that pattern `LiveRepository`.
+In [another article][liverepository-article] in this blog, in the section 'Observable repository', I described a design pattern I use for different observers to be notified when there has been a change in the repository. I call that pattern `LiveRepository`.
 
 This is the code I was using before I performed a refactoring, which I will discuss shortly. **Please do not use it**:
 
