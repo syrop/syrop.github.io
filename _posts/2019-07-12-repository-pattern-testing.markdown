@@ -181,7 +181,7 @@ By using the libraries provided by Google, even though they are in alpha stage n
 
 The required dependencies for [`liveData()`][livedata] are listed in Google's [documentation][livedata-dependencies].
 
-The only time when I use `upDateLiveData()` with `CoroutineContext` other than the defauld `EmptyCoroutineContext` is when I don't consume the `LiveData` in `Activity` or `Fragment`, but inside `ViemModel`:
+The only time when I use `updatedLiveData()` with `CoroutineContext` other than the default `EmptyCoroutineContext` is when I don't consume the `LiveData` in `Activity` or `Fragment`, but inside `ViemModel`:
 
 ```kotlin
 class CommViewModel(private val state: SavedStateHandle) : ViewModel() {
