@@ -51,7 +51,7 @@ private suspend fun refresh(transform: suspend (Comm) -> Comm): List<Comm> =
         }
 ```
 
-In the above code, the most of work is performed by the `refresh` function. It takes as a parameter the lambda that will be called od every item, runs it asynchronously and saves the changes before returning the transformed list.
+In the above code, the most of work is performed by the `refresh()` function. It takes as a parameter the lambda that will be called od every item, runs it asynchronously and saves the changes before returning the transformed list.
 
 Above it, there are two functions that take advantafe of `refresh()` by calling it in order to replace every item either by one with just an updated admin status, or with one whose all values save for color have been replaced with that from Firebase Firestore.
 
