@@ -155,30 +155,28 @@ I added some more debugs to verify that:
 
 ```kotlin
 GlobalScope.launch {
-    println("wiktor global scope thread: ${Thread.currentThread()}")
     val threads = Array(100_000) {
-        async(Dispatchers.Unconfined) {
-            "${Thread.currentThread()} ${Looper.getMainLooper().thread == Thread.currentThread()}"
-        }
+        async(Dispatchers.Unconfined) { Thread.currentThread() }
     }.map { it.await() }.toSet()
     println("wiktor size ${threads.size}")
-    println("wiktor ${threads.take(1)}")
+    val thread = threads.take(1)[0]
+    println("wiktor GlobalScope thread ${thread == Thread.currentThread()}")
+    println("wiktor main thread ${thread == Looper.getMainLooper().thread}")
+}
 }
 ```
 
-This time, each coroutine produces a string combining the current thread and a flag whether it is main thread.
-
-I also added a debug showing the name of the thread that runs the `GlobalScope`.
+This time, I take an instance of the only thread that runs the coroutines. I compare it to the current thread (the thread that runs the GlobalScope), and verify that it is different from main thread.
 
 The output:
 
 ```
-wiktor global scope thread: Thread[DefaultDispatcher-worker-1,5,main]
 wiktor size 1
-wiktor [Thread[DefaultDispatcher-worker-1,5,main] false]
+wiktor GlobalScope thread true
+wiktor main thread false
 ```
 
-It shows that all of the coroutines run on one thread, which happens to be the same thread `GlobalScope` runs on, and is different from main thread.
+The above output shows that all of the coroutines run on one thread, which happens to be the same thread `GlobalScope` runs on, and is different from the main thread.
 
 Can `Dispatchers.Unconfined` run on main thread?
 
