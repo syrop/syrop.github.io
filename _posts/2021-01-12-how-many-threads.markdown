@@ -178,7 +178,7 @@ wiktor main thread false
 
 The above output shows that all of the coroutines run on one thread, which happens to be the same thread `GlobalScope` runs on, and is different from the main thread.
 
-Can `Dispatchers.Unconfined` run on main thread?
+Can `Dispatchers.Unconfined` run on the main thread?
 
 Of course. I wrote the following code:
 
