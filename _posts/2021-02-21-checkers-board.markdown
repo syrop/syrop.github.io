@@ -81,6 +81,32 @@ It draws the board and the pieces separately.
 
 Please note the line ```data="@{viewModel.dataFlow}"```. This is what combines ```StateFlow``` with the view.
 
+## The fragment
+
+ ```LifecycleOwner``` must be set to the binding. Notice the line ```binding.lifecycleOwner = this``` in the code below:
+
+```kotlin
+class GameFragment : Fragment(R.layout.fr_game) {
+
+    private lateinit var binding: FrGameBinding
+    private val viewModel by viewModels<GameVM>()
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        binding = FrGameBinding.inflate(inflater, container, false)
+        binding.lifecycleOwner = this
+        binding.viewModel = viewModel
+        return binding.root
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+    }
+}
+```
+
 ## The board
 
 Drawing the board is straightforward and will not be explained here:
