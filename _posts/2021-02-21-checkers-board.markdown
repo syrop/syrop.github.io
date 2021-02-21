@@ -1,6 +1,6 @@
 ---
 layout: post
-title:  "Drawing checkers board (data binding and StateFlow)"
+title:  "Drawing a checkers board (data binding and StateFlow)"
 date:   2021-02-21 18:53:00 +0200
 categories: jekyll update
 ---
