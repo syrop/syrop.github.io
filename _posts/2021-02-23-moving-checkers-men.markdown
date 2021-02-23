@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Moving checkers men (functional programming)"
-date:   2021-02-21 18:53:00 +0200
+date:   2021-02-23 18:53:00 +0200
 categories: jekyll update
 ---
 
