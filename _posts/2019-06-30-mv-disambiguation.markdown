@@ -11,7 +11,7 @@ This article attempts to explain the differences between [MVP], [MVVM] and [MVC]
 
 The *V* in [MVP], [MVVM] and [MVC] doesn't really have to stand for *view*. *View* is just a special case of something that is receiving information from the other parts of the architecture, for example the *view model*.
 
-Thruout the present article, therefore, I will often use the term *consumer*, borrowed from the [producer-consumer problem]. (Buffering data will not be discussed in the article, though).
+Thruout the present article, therefore, I will often use the term *consumer*, borrowed from the [producer-consumer problem][producer-consumer]. (Buffering data will not be discussed in the article, though).
 
 I am not going to change the original names [MVP], [MVVM] and [MVC], however, I may occasionally use the term *consumer* interchangeably with *view* to indicate that either of these may not only display data on the GUI, but also record them in a database, a log etc.
 
