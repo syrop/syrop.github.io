@@ -183,7 +183,7 @@ To avoid having to deal with this timeout, the developer may manually set it to 
 
 When `LiveData` is extended manually by overriding the functions [`onActive()`][on-active] and [`onInactive()`][on-inactive], the way I explained in [another article][extending-article] in this blog, the `Channel` is closed immediately, so the developer may write tests without taking timeout into consideration. Doing so is outside of the scope of the present article, though.
 
-# MVC
+## MVC
 
 I don't think I have ever consciously used [MVC] in Android. The Wikipedia image below shows that in [MVC] the *view* doesnt't have a relationship with the *controller*. All that the *view* does, according to my understanding of the diagram, is it displays data that has been made available to it:
 
