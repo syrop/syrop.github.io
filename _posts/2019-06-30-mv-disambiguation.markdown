@@ -122,7 +122,7 @@ Here, in the above code, the `Channel` is only created when thus created `LiveDa
 
 ## Testing MVVM
 
-[Another article][testing-article] in this blog explains how to test [MVVP]:
+[Another article][testing-article] in this blog explains how to test [MVVM]:
 
 ```kotlin
 @Test
