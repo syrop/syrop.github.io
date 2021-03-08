@@ -136,7 +136,7 @@ There are two ways in which something may be observed. One is aware of `Lifecycl
 Things observed in `Activity` and `Fragment` should probably use `LiveData`, but beceause `Lifecycle` is not present in `ViewModel`, but `viewModelScope` is, the developer, apart from returning an instance of `LiveData`, should provide a mechanism that is canceled simultaneously with the surrounding `CoroutineScope`.
 
 
-In the above code, I accomodated for the first case by implementing the operator `plus()` that combines `LiveData` with `LifeCycle`, so that it may be observed by an outside code. The latter case is addressed by the suspend operator `invoke()`, which runs a block of code on each update, as long as the `CoroutineScope` it runs in is not canceled.
+In the above code, I accommodated for the first case by implementing the operator `plus()` that combines `LiveData` with `LifeCycle`, so that it may be observed by an outside code. The latter case is addressed by the suspend operator `invoke()`, which runs a block of code on each update, as long as the `CoroutineScope` it runs in is not canceled.
 
 The DSL I used in the above code is discussed in a [dedicated article][dsl-article] in this blog. Please note that at present, I **do not recommend** using it.
 
