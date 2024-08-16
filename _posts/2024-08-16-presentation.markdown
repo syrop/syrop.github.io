@@ -18,7 +18,7 @@ The project I use for the demonstation is [Victor Checkers][checkers] This is th
 
 ## The problem
 
-The problem with the previous solution, which treated the Presentation layer like an Android library rather than a Java library, was that I found the JUnit tests placed in the Android library did not recognize the classes set in a Java module.
+The problem with the previous solution, which treated the Presentation layer like an Android library rather than a Java library, was that I found the JUnit tests placed in the Android library did not recognize the classes present in a Java module.
 
 ## The solution
 
@@ -77,7 +77,7 @@ var whiteWon = MutableStateFlow(false)
 var blackWon = MutableStateFlow(false)
 ```
 
-**Step 3, ViewModel***
+**Step 3, ViewModel**
 
 The reason I still use ```VIewModel``` is that I want to have access to ```vievModelScope```. If I ever decide to navigate away from the checkerboard screen, I want the minimax algorihm to automatically cancel generation of the new movements, but I do want it to survive mere screen orientation changes.
 
