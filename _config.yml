@@ -16,7 +16,7 @@
 title: Wiktor's architecture blog
 
 description: >- # this means to ignore newlines until "baseurl:"
-  Design patterns and architecture used in open source projects of Wiktor Nizio.
+  Design patterns and architecture used in the open source projects of Wiktor Nizio.
 baseurl: "" # the subpath of your site, e.g. /blog
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 github_username:  syrop
