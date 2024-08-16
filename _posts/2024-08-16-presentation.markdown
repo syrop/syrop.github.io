@@ -5,184 +5,201 @@ date:   2024-08-16 9:37:00 +0200
 categories: jekyll update
 ---
 
-In this article I will explain how to implement a slideshow with continuously updated progress bar.
+In this article I will explain how I separated Presentation layer from Android libraries and dependencies.
 
 ## Topics covered
 
-* Implementing your own View with dynamic colors.
-* Flow.
-* Jetpack compose.
+* Clean Architecture
+* Testing
 
 ## The project
 
-The project I use for the demonstation is [Slideshow]. It is a copy of the prototype project [MyApplication], so it may contain some redundant code and dependencies, which you may want to remove for the sake of [YAGNI].
+The project I use for the demonstation is [Victor Checkers][checkers] This is the [commit] in question.
 
-## The images
+## The problem
 
-The images come from a Wikipedia article about [Michael Jackson][michael].  Their respective URLs are hardcoded.
+The problem with the previous solution, which treated the Presentation layer like an Android library rather than a Java library, was that I found the JUnit tests placed in the Android library did not recognize the classes set in a Java module.
 
-## Segmented progress bar
+## The solution
 
-The segmented progress bar View draws three rounded rectangles that corelate with the three images of Michael Jackson.
+The solution was to remove Android dependencies from the Presentation layer. This is the solution I found in  Eran Boudjnah's project [Clean Architecture for Android Sample Project][clean].
 
-The problem is that while the subsequent segments are rounded, the edge indicating the continuous progress is straight. To achieve this effect I use ```clipRect```:
+## The steps
 
-```kotlin
-@SuppressLint("DrawAllocation")
-override fun onDraw(canvas: Canvas) {
-    super.onDraw(canvas)
-    val segmentSize = (width / numberOfSegments)
-    fun drawSegment(id: Int, paint: Paint) {
-        canvas.drawRoundRect(
-            3F + id * segmentSize,
-            0F,
-            (id + 1) * segmentSize - 3F,
-            height.toFloat(),
-            40F,
-            40F,
-            paint,
-        )
-    }
+**Step 1**
 
-    for (i in 0 until  numberOfSegments) {
-        drawSegment(i, if (i < progress) progressedPaint else backgroundPaint)
-    }
-    if (fraction != null) {
-        canvas.clipRect(
-            Rect(
-                (3F + progress * segmentSize + fraction!! * segmentSize).roundToInt(),
-                0,
-                (id + 1) * segmentSize - 3,
-                height,
-            )
-        )
-    }
-    drawSegment(progress, progressedPaint)
+Just remove Android dependencies from your module's level build.gradle:
+
+```groovy
+plugins {
+    id 'java-library'
+    id 'org.jetbrains.kotlin.jvm'
+    id 'kotlin-kapt'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+dependencies {
+    kapt "com.google.dagger:hilt-compiler:2.52"
+
+    implementation project(':checkers-domain')
+
+    testImplementation 'junit:junit:4.13.2'
+    testImplementation "org.mockito.kotlin:mockito-kotlin:5.4.0"
+    testImplementation "org.mockito:mockito-inline:5.2.0"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.9.0-RC.2"
 }
 ```
 
-The colors of the progress bar are taken from your wallpaper, if you are using Android 12 or above. Using of dynamics colors is explained in my [other article][colors]:
+**Step 2**
+
+Rename ```BaseViewModel``` to ```BasePresentation``` and don't inherit it from ```ViewModel```.
 
 ```kotlin
-private val backgroundPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-private val progressedPaint = Paint(Paint.ANTI_ALIAS_FLAG)
-...
-init {
-    backgroundPaint.color = resources.getColor(com.google.android.material.R.color.material_dynamic_primary20, null)
-    backgroundPaint.style = Paint.Style.FILL
-    progressedPaint.color = resources.getColor(com.google.android.material.R.color.material_dynamic_primary80, null)
-	progressedPaint.style = Paint.Style.FILL
+package pl.org.seva.checkers.presentation.architecture
+
+import ...
+
+abstract class BasePresentation<VIEW_STATE : Any, NOTIFICATION : Any>(
+    useCaseExecutorProvider: UseCaseExecutorProvider
+) { ...
+```
+
+**Step 3**
+
+Replace ```androidx.compose.runtime.State``` with ```kotlinx.coroutines.flow.MutableStateFlow```.
+
+```kotlin
+var whiteWon = MutableStateFlow(false)
+var blackWon = MutableStateFlow(false)
+```
+
+**Step 3, ViewModel***
+
+The reason I still use ```VIewModel``` is that I want to have access to ```vievModelScope```. If I ever decide to navigate away from the checkerboard screen, I want the minimax algorihm to automatically cancel generation of the new movements, but I do want it to survive mere screen orientation changes.
+
+This is what I put in the UI layer:
+
+```kotlin
+package pl.org.seva.checkers.ui.view
+
+import ...
+import androidx.lifecycle.viewModelScope
+import dagger.hilt.android.lifecycle.HiltViewModel
+import pl.org.seva.checkers.presentation.GamePresentation
+import javax.inject.Inject
+
+@HiltViewModel
+class GameViewModel @Inject constructor(
+    private val presentation: GamePresentation
+) : ViewModel() { ...
+```
+
+The ```ViewModel``` is small, though, and only maps the methods to corresponding methods in the ```Presentation``` class in the Presentation layer.
+
+**Step 4, Jetpack Compose**
+
+Because I use ```StateFlow``` in the Presentation layer, in the UI layer I convert them again to ```State```.
+
+This is what I do in the ```Fragment```:
+
+```kotlin
+Pieces(
+    piecesPresentationToUiMapper.toUi(vm.viewState.collectAsState().value.pieces),
+    vm.viewState.collectAsState().value.movingWhiteMan,
+    vm.viewState.collectAsState().value.movingWhiteKing,
+    onTouchListener,
+)
+```
+
+**Step 5, usecases**
+
+Because I no longer use ```ViewModel``` in the Presentation layer, I had to somehow come up with a way to pass ```viewModelScope``` from the UI layer to the Presentation layer.
+
+This is what I do in ```GameViewModel``` to call a usecase:
+
+```kotlin
+fun addWhite(x: Int, y: Int, king: Boolean) = presentation.addWhite(x, y, king, viewModelScope)
+```
+
+This is the method in ```GamePresentation```:
+
+```kotlin
+fun addWhite(x: Int, y: Int, forceKing: Boolean = false, coroutineScope: CoroutineScope) {
+    updateViewState(if (forceKing || y == 0) {
+        viewState.value.addWhiteKing(x to y)
+    }
+    else {
+        viewState.value.addWhiteMan(x to y)
+    })
+    lastMove = LastMove.WHITE
+    execute(whiteMoveUseCase, coroutineScope, piecesPresentationToDomainMapper.toDomain(viewState.value.pieces), ::presentPieces)
 }
 ```
 
-## Jetpack Compose
-
-This is how I place the view inside Jetpack Compose:
+And this is the ```execute``` method in ```BasePresentation```:
 
 ```kotlin
-val timer = ...
-Column {
-    repeat(slides.size) {
-        val slide = slides[it]
-        AnimatedVisibility(visible = timer == it) {
-            val fraction = ...
-            Box(modifier = Modifier.padding(16.dp)) {
-                Image(
-                    painter = rememberCoilPainter(
-                        request = slide,
-                    ),
-                    contentDescription = null,
-                    contentScale = ContentScale.FillWidth,
-                    modifier = Modifier.fillMaxWidth(),
+protected fun <INPUT, OUTPUT> execute(
+    useCase: UseCase<INPUT, OUTPUT>,
+    coroutineScope: CoroutineScope,
+    value: INPUT,
+    onSuccess: (OUTPUT, CoroutineScope) -> Unit = { _, _ -> },
+    onException: (DomainException) -> Unit = {}
+) {
+        useCaseExecutor.execute(useCase, coroutineScope, value, onSuccess, onException)
+}
+```
+
+For reference, this is the full code of ```UseCaseExecutor```:
+
+```kotlin
+package pl.org.seva.checkers.domain.cleanarchitecture.usecase
+
+import ...
+
+class UseCaseExecutor {
+
+    fun <INPUT, OUTPUT> execute(
+        useCase: UseCase<INPUT, OUTPUT>,
+        coroutineScope: CoroutineScope,
+        value: INPUT,
+        onSuccess: (OUTPUT, CoroutineScope) -> Unit = { _, _ ->},
+        onException: (DomainException) -> Unit = {}
+    ) {
+        coroutineScope.launch {
+            try {
+                useCase.execute(value, coroutineScope, onSuccess)
+            }
+            catch (ignore: CancellationException) {
+            }
+            catch (throwable: Throwable) {
+                onException(
+                    (throwable as? DomainException)
+                        ?: UnknownDomainException(throwable)
                 )
-                key(fraction) {
-                    AndroidView(
-                        factory = { context ->
-                            SegmentedProgressbar(
-                                context,
-                                null,
-                            ).apply {
-                                this.fraction = fraction
-                                numberOfSegments = slides.size
-                                progress = it
-                            }
-                        },
-                        modifier = Modifier
-                            .padding(bottom = 24.dp)
-                            .align(Alignment.BottomCenter)
-                            .width(120.dp)
-                            .height(6.dp)
-                    )
-                }
             }
         }
     }
+
 }
 ```
 
-For creation of the `SegmentedProgressBar` instance I could use the [builder pattern][builder], but using the correct design patterns is not within the scope of this article. Furthermore, I save some allocations by using `apply` instead, and this code is being executed several times per second.
+## Summary
 
-The ```key``` function above forces redrawing of the SegmentedProgressBar whenever ```fraction``` changes. Without this, the progress bar would be updated only once every five seconds when ```timer``` updates, and this is not what I want to demonstrate.
+The following steps have been used for getting rid of Android dependencies in the Presentation layer:
 
-I use ```Column``` at the top to limit the height of the contained ```Box```. Without ```Column```, the ```Box``` would occupy all available space (the whole screen), but I want the progress bar to be displayed on the top of the pictures. Using of ```Column``` here limits the height of the included content.
+* Remove the dependencies themselves.
+* Create a new ```ViewModel``` class in the UI layer, for the sake of ```viewModelScope```.
+* Every time you execute a test case, pass the ```viewModelScope``` in a parameter to the Presentation layer.
 
-## Animation
 
-This is the animation:
 
-```kotlin
-private val animation =  TargetBasedAnimation(tween(5000, easing = LinearEasing), Int.VectorConverter, 0, 1000)
-```
 
-The main parts worth noticing are ```tween``` and ```LinearEasing```. This assures that the animation will be performed in a linear way. 
-
-Because the desired animation is linear, I could just increment the progress by a constant value every so many milliseconds, but I want this to be more universal. You can experiment with replacing ```tween``` and ```LinearEasing``` with other options.
-
-## Coroutines
-
-These are the coroutines that measure time:
-
-```kotlin
-val timer = remember {
-    flow {
-        while (true) {
-            repeat(slides.size) {
-                emit(it)
-                delay(5_000L)
-            }
-        }
-    }
-}.collectAsState(initial = 0).value
-...
-val fraction = remember(it) {
-    flow {
-        val beginning = System.nanoTime()
-        while (true) {
-            emit(
-                animation.getValueFromNanos(System.nanoTime() - beginning)
-                    .toFloat() / 1000f
-            )
-            delay(10L)
-        }
-    }
-}.collectAsState(initial = 0f).value
-```
-
-## Conclusion
-
-The article shows how to achieve the effect of continuously updated segmented progress bar displayed at the top of a slideshow.
-
-Assumpion is made that the reader is able to download the code from [GitHub][slideshow], and that they understand the basics of View, coroutines and Jetpack Compose.
-
-The code could be further improved by using the [builder] pattern, and by avoiding the use of [magic numbers][numbers], but it is not the point of this article.
-
-Perhaps I could use a custom ```@Composable``` instead of a ```View```, but I haven't been able to find documentation on that.
-
-[slideshow]: https://github.com/syrop/Slideshow
-[myapplication]: https://github.com/syrop/MyApplication
-[yagni]: https://en.wikipedia.org/wiki/You_aren%27t_gonna_need_it
-[michael]: https://en.wikipedia.org/wiki/Michael_Jackson
-[colors]: https://syrop.github.io/jekyll/update/2021/02/23/moving-checkers-men.html
-[builder]: https://en.wikipedia.org/wiki/Builder_pattern
-[numbers]: https://en.wikipedia.org/wiki/Magic_number_(programming)
+[checkers]: https://github.com/syrop/Checkers
+[commit]: https://github.com/syrop/Checkers/commit/e919a2b9ece2bd87e786d6cc985c00544f0385bc
+[clean]: https://github.com/EranBoudjnah/CleanArchitectureForAndroid
 

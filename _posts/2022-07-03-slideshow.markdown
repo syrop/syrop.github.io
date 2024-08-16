@@ -11,7 +11,7 @@ In this article I will explain how to implement a slideshow with continuously up
 
 * Implementing your own View with dynamic colors.
 * Flow.
-* Jetpack compose.
+* Jetpack Compose.
 
 ## The project
 
