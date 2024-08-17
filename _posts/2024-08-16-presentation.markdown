@@ -79,7 +79,7 @@ var blackWon = MutableStateFlow(false)
 
 **Step 3, ViewModel**
 
-The reason I still use ```VIewModel``` is that I want to have access to ```vievModelScope```. If I ever decide to navigate away from the checkerboard screen, I want the minimax algorihm to automatically cancel generation of the new movements, but I do want it to survive mere screen orientation changes.
+The reason I still use ```ViewModel``` is that I want to have access to ```viewModelScope```. If I ever decide to navigate away from the checkerboard screen, I want the minimax algorithm to automatically cancel generation of the new movements, but I do want it to survive mere screen orientation changes.
 
 This is what I put in the UI layer:
 
@@ -87,10 +87,6 @@ This is what I put in the UI layer:
 package pl.org.seva.checkers.ui.view
 
 import ...
-import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
-import pl.org.seva.checkers.presentation.GamePresentation
-import javax.inject.Inject
 
 @HiltViewModel
 class GameViewModel @Inject constructor(
